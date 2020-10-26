@@ -37,9 +37,6 @@ jobs:
       run: dotnet restore
       working-directory: src
       
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
-
     - name: Build
       run: dotnet pack -v minimal -c ${{ env.configuration }}
       working-directory: src
@@ -47,9 +44,11 @@ jobs:
     - name: Install Report Generator
       run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
-    - name: Run Unit Tests
-      run: dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput="../../artifacts/coverage/coverage.xml" /p:Include="[${{ env.productNamespacePrefix}}*]*" /p:Exclude="[${{ env.productNamespacePrefix}}*Tests.*]*"
-      working-directory: src
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Build
+      run: msbuild /t:build,pack /maxcpucount /p:NoPackageAnalysis=true /verbosity:minimal /p:Configuration=${{ env.configuration }}working-directory: src
 
     - name: Generate Coverage Report
       run: reportgenerator -reports:"coverage.*.xml" -targetdir:report-output
