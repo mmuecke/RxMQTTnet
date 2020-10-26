@@ -1,0 +1,41 @@
+﻿using System.Text.RegularExpressions;
+
+namespace MQTTnet.Extensions.RxMQTTnet
+{
+    /// <summary>
+    /// A filter for a mqtt topic allowing wildcards.
+    /// </summary>
+    /// <remarks>Wildcards '#' and '+' are allowed.</remarks>
+    public class TopicFilter
+    {
+        private readonly Regex topicRegex;
+
+        /// <summary>
+        /// Crate a filter for a mqtt topic allowing wildcards.
+        /// </summary>
+        /// <remarks>Wildcards '#' and '+' are allowed.</remarks>
+        /// <param name="topic">The topic to filter for.</param>
+        public TopicFilter(string topic)
+        {
+            Topic = topic;
+            var topicRegexStrings = topic
+                         .Replace(@"/", @"\/")
+                         .Replace("+", @"([a-zA-Z0-9]+)?")
+                         .Replace("#", @"[a-zA-Z0-9\/]+");
+
+            topicRegex = new Regex("^" + topicRegexStrings + "$");
+        }
+
+        /// <summary>
+        /// Check if the string matches the topic.
+        /// </summary>
+        /// <param name="topic">The topic to check.</param>
+        /// <returns>If the topic match the string.</returns>
+        public bool IsTopicMatch(string topic) => topicRegex.IsMatch(topic);
+
+        /// <summary>
+        /// The topic to filter for.
+        /// </summary>
+        public string Topic { get; }
+    }
+}
