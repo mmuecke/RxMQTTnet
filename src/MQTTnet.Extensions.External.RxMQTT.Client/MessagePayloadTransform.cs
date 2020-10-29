@@ -2,7 +2,7 @@
 using System;
 using System.Reactive.Linq;
 
-namespace MQTTnet.Extensions.RxMQTTnet
+namespace MQTTnet.Extensions.External.RxMQTT.Client
 {
     internal class MessagePayloadTransform<T>
     {

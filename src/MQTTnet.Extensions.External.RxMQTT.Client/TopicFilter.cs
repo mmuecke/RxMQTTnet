@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace MQTTnet.Extensions.RxMQTTnet
+namespace MQTTnet.Extensions.External.RxMQTT.Client
 {
     /// <summary>
     /// A filter for a mqtt topic allowing wildcards.

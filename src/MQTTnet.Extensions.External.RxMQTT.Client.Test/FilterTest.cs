@@ -1,10 +1,10 @@
-﻿using MQTTnet.Extensions.RxMQTTnet;
+﻿using MQTTnet.Extensions.External.RxMQTT.Client;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
 
-namespace MQTTnet.Extensions.RxMQTTnet.Test
+namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 {
     public class FilterTest
     {

@@ -15,7 +15,7 @@ using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MQTTnet.Extensions.RxMQTTnet
+namespace MQTTnet.Extensions.External.RxMQTT.Client
 {
     /// <summary>
     /// A mqtt client using <see cref="System.Reactive"/> for subscribing to topics.

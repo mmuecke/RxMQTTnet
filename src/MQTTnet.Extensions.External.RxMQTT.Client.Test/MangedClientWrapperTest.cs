@@ -7,7 +7,7 @@ using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Disconnecting;
 using MQTTnet.Client.Options;
 using MQTTnet.Extensions.ManagedClient;
-using MQTTnet.Extensions.RxMQTTnet;
+using MQTTnet.Extensions.External.RxMQTT.Client;
 using System;
 using System.Linq;
 using System.Reactive;
@@ -17,7 +17,7 @@ using System.Reactive.Linq;
 using System.Threading;
 using Xunit;
 
-namespace MQTTnet.Extensions.RxMQTTnet.Test
+namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 {
     public class MangedClientWrapperTest
     {

@@ -3,7 +3,7 @@ using MQTTnet.Diagnostics;
 using MQTTnet.Extensions.ManagedClient;
 using System;
 
-namespace MQTTnet.Extensions.RxMQTTnet
+namespace MQTTnet.Extensions.External.RxMQTT.Client
 {
     /// <summary>
     /// Extension to <see cref="MqttFactory"/> to crate a <see cref="IRxMqttClinet"/>.

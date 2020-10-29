@@ -6,7 +6,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using Xunit;
 
-namespace MQTTnet.Extensions.RxMQTTnet.Test
+namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 {
     public class Extensions
     {
