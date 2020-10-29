@@ -2,7 +2,7 @@
 using Microsoft.Reactive.Testing;
 using MQTTnet;
 using MQTTnet.Extensions.ManagedClient;
-using MQTTnet.Extensions.RxMQTTnet;
+using MQTTnet.Extensions.External.RxMQTT.Client;
 using System;
 using System.Linq;
 using System.Reactive;
@@ -11,7 +11,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Xunit;
 
-namespace MQTTnet.Extensions.RxMQTTnet.Test
+namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 {
     public class RxSubscriber
     {

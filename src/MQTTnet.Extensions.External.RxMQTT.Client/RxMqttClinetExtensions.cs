@@ -4,7 +4,7 @@ using System;
 using System.Reactive.Linq;
 using System.Text;
 
-namespace MQTTnet.Extensions.RxMQTTnet
+namespace MQTTnet.Extensions.External.RxMQTT.Client
 {
     public static class RxMqttClinetExtensions
     {
