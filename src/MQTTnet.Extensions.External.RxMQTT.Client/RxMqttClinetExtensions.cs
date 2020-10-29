@@ -6,6 +6,9 @@ using System.Text;
 
 namespace MQTTnet.Extensions.External.RxMQTT.Client
 {
+    /// <summary>
+    /// Extensions for rx mqtt client.
+    /// </summary>
     public static class RxMqttClinetExtensions
     {
         /// <summary>
@@ -108,7 +111,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// Select the payload as <typeparamref name="T"/> from the message.
         /// </summary>
         /// <param name="source">The source observable.</param>
-        /// <param name="getPayloadFunc">The function to geht the payload form the <see cref="byte[]"/>.</param>
+        /// <param name="getPayloadFunc">The function to geht the payload form the <see cref="byte"/> array.</param>
         /// <param name="skipOnError">Messages that can not be transformed are skipped.</param>
         /// <returns>The selected payload observable.</returns>
         /// <exception cref="ArgumentNullException"></exception>
@@ -139,7 +142,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// Select the payload as <typeparamref name="T"/> from the event arguments.
         /// </summary>
         /// <param name="source">The source observable.</param>
-        /// <param name="getPayloadFunc">The function to geht the payload form the <see cref="byte[]"/>.</param>
+        /// <param name="getPayloadFunc">The function to geht the payload form the <see cref="byte"/> array.</param>
         /// <param name="skipOnError">Messages that can not be transformed are skipped.</param>
         /// <returns>The selected payload observable.</returns>
         /// <exception cref="ArgumentNullException"></exception>
