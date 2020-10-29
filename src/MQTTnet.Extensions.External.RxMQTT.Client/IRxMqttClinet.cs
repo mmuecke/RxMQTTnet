@@ -30,7 +30,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// <summary>
         /// Observer for the connection failed event.
         /// </summary>
-        IObservable<ManagedProcessFailedEventArgs> ConnectingFailed { get; }
+        IObservable<ManagedProcessFailedEventArgs> ConnectingFailedEvent { get; }
 
         /// <summary>
         /// Observer for the disconnected event.
@@ -68,7 +68,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// <summary>
         /// Observer for events when subscribing failed.
         /// </summary>
-        IObservable<ManagedProcessFailedEventArgs> SynchronizingSubscriptionsFailed { get; }
+        IObservable<ManagedProcessFailedEventArgs> SynchronizingSubscriptionsFailedEvent { get; }
 
         /// <summary>
         /// Connect to a subscription to the <paramref name="topic"/>.

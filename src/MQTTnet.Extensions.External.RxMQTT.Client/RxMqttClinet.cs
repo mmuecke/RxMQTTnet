@@ -40,7 +40,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// <exception cref="ArgumentNullException"></exception>
         public RxMqttClinet(IManagedMqttClient managedMqttClient, IMqttNetLogger logger)
         {
-            this.InternalClient = managedMqttClient ?? throw new ArgumentNullException(nameof(managedMqttClient));
+            InternalClient = managedMqttClient ?? throw new ArgumentNullException(nameof(managedMqttClient));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
             this.logger = logger.CreateScopedLogger(nameof(RxMqttClinet));
             topicSubscriptionCache = new Dictionary<string, IObservable<MqttApplicationMessageReceivedEventArgs>>();
@@ -59,13 +59,13 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                     return Disposable.Create(() => managedMqttClient.UseDisconnectedHandler(_ => null));
                 });
 
-            ConnectingFailed = CrateFromHandler<ManagedProcessFailedEventArgs>(observer =>
+            ConnectingFailedEvent = CrateFromHandler<ManagedProcessFailedEventArgs>(observer =>
                 {
                     managedMqttClient.ConnectingFailedHandler = new ConnectingFailedHandlerDelegate(args => observer.OnNext(args));
                     return Disposable.Create(() => managedMqttClient.ConnectingFailedHandler = null);
                 }); ;
 
-            SynchronizingSubscriptionsFailed = CrateFromHandler<ManagedProcessFailedEventArgs>(observer =>
+            SynchronizingSubscriptionsFailedEvent = CrateFromHandler<ManagedProcessFailedEventArgs>(observer =>
                 {
                     managedMqttClient.SynchronizingSubscriptionsFailedHandler = new SynchronizingSubscriptionsFailedHandlerDelegate(args => observer.OnNext(args));
                     return Disposable.Create(() => managedMqttClient.SynchronizingSubscriptionsFailedHandler = null);
@@ -114,7 +114,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         public IObservable<MqttClientConnectedEventArgs> ConnectedEvent { get; }
 
         /// <inheritdoc/>
-        public IObservable<ManagedProcessFailedEventArgs> ConnectingFailed { get; }
+        public IObservable<ManagedProcessFailedEventArgs> ConnectingFailedEvent { get; }
 
         /// <inheritdoc/>
         public IObservable<MqttClientDisconnectedEventArgs> DisconnectedEvent { get; }
@@ -135,7 +135,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         public int PendingApplicationMessagesCount => InternalClient.PendingApplicationMessagesCount;
 
         /// <inheritdoc/>
-        public IObservable<ManagedProcessFailedEventArgs> SynchronizingSubscriptionsFailed { get; }
+        public IObservable<ManagedProcessFailedEventArgs> SynchronizingSubscriptionsFailedEvent { get; }
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentException"></exception>

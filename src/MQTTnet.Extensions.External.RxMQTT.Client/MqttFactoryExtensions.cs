@@ -1,5 +1,4 @@
-﻿using MQTTnet;
-using MQTTnet.Diagnostics;
+﻿using MQTTnet.Diagnostics;
 using MQTTnet.Extensions.ManagedClient;
 using System;
 
