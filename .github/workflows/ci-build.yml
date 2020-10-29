@@ -52,7 +52,7 @@ jobs:
       working-directory: src
 
     - name: Generate Coverage Report
-      run: reportgenerator -reports:"coverage.*.xml" -targetdir:'report-output'
+      run: reportgenerator -reports:"coverage.xml" -targetdir:report-output
       working-directory: artifacts/coverage
 
     - name: Upload Code Coverage
