@@ -1,5 +1,4 @@
-﻿using MQTTnet;
-using MQTTnet.Protocol;
+﻿using MQTTnet.Protocol;
 using System;
 using System.Reactive.Linq;
 using System.Text;

@@ -1,26 +1,9 @@
-﻿using MQTTnet.Extensions.External.RxMQTT.Client;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Xunit;
+﻿using Xunit;
 
 namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 {
     public class FilterTest
     {
-        [Theory]
-        [InlineData("Test/#", "Test/P/Te/T", true)]
-        [InlineData("Test/Pre/#", "Test/Pre/Te/T", true)]
-        [InlineData("P/+/Test", "P/T/Test", true)]
-        [InlineData("P/+/Test", "Pre/T/Test", false)]
-        [InlineData("Pre/+/Test", "Pre/T/Test", true)]
-        [InlineData("Pre/+/Test", "P/T/Test", false)]
-        public void Wildcards(string topicFilter, string topicRecived, bool result)
-        {
-            var filter = new TopicFilter(topicFilter);
-            Assert.Equal(result, filter.IsTopicMatch(topicRecived));
-        }
-
         [Theory]
         [InlineData("Test/Pre", "Test/Pre", true)]
         [InlineData("Test/Pre", "Test/Pre/Te/T", false)]
@@ -42,6 +25,19 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 
             // test
             Assert.Equal(topic, filter.Topic);
+        }
+
+        [Theory]
+        [InlineData("Test/#", "Test/P/Te/T", true)]
+        [InlineData("Test/Pre/#", "Test/Pre/Te/T", true)]
+        [InlineData("P/+/Test", "P/T/Test", true)]
+        [InlineData("P/+/Test", "Pre/T/Test", false)]
+        [InlineData("Pre/+/Test", "Pre/T/Test", true)]
+        [InlineData("Pre/+/Test", "P/T/Test", false)]
+        public void Wildcards(string topicFilter, string topicRecived, bool result)
+        {
+            var filter = new TopicFilter(topicFilter);
+            Assert.Equal(result, filter.IsTopicMatch(topicRecived));
         }
     }
 }

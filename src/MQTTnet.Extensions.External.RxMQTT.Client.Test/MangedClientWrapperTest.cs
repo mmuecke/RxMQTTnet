@@ -1,45 +1,22 @@
 using Autofac.Extras.Moq;
 using Microsoft.Reactive.Testing;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
-using Moq;
-using MQTTnet;
 using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Disconnecting;
 using MQTTnet.Client.Options;
+using MQTTnet.Diagnostics;
 using MQTTnet.Extensions.ManagedClient;
-using MQTTnet.Extensions.External.RxMQTT.Client;
 using System;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using Xunit;
-using MQTTnet.Diagnostics;
 
 namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 {
     public class MangedClientWrapperTest
     {
-        [Fact]
-        public void Connected_Returns_False_Init()
-        {
-            using var mock = AutoMock.GetLoose();
-
-            mock.Mock<IManagedMqttClient>();
-            var rxMqttClinet = mock.Create<RxMqttClinet>();
-
-            var testScheduler = new TestScheduler();
-
-            // act
-            var testObserver = testScheduler.Start(() => rxMqttClinet.Connected, 0, 0, 1);
-
-            Assert.Single(testObserver.Messages);
-            Assert.Equal(NotificationKind.OnNext, testObserver.Messages.Single().Value.Kind);
-            Assert.False(testObserver.Messages.Single().Value.Value);
-        }
-
         [Fact]
         public void Connected_Observer()
         {
@@ -59,23 +36,21 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         }
 
         [Fact]
-        public void Disconnected_Observer()
+        public void Connected_Returns_False_Init()
         {
             using var mock = AutoMock.GetLoose();
-            mock.Mock<IManagedMqttClient>().SetupProperty(x => x.ConnectedHandler)
-            .SetupProperty(x => x.DisconnectedHandler);
+
+            mock.Mock<IManagedMqttClient>();
             var rxMqttClinet = mock.Create<RxMqttClinet>();
 
             var testScheduler = new TestScheduler();
 
-            testScheduler.ScheduleAsync(TimeSpan.FromTicks(2), (_, __) => mock.Mock<IManagedMqttClient>().Object.ConnectedHandler.HandleConnectedAsync(new MqttClientConnectedEventArgs(new MqttClientAuthenticateResult())));
-            testScheduler.ScheduleAsync(TimeSpan.FromTicks(3), (_, __) => mock.Mock<IManagedMqttClient>().Object.DisconnectedHandler.HandleDisconnectedAsync(new MqttClientDisconnectedEventArgs(true, new Exception(), new MqttClientAuthenticateResult(), MqttClientDisconnectReason.KeepaliveTimeout)));
             // act
-            var testObserver = testScheduler.Start(() => rxMqttClinet.Connected, 0, 0, 4);
+            var testObserver = testScheduler.Start(() => rxMqttClinet.Connected, 0, 0, 1);
 
-            Assert.Equal(3, testObserver.Messages.Count);
-            Assert.Equal(NotificationKind.OnNext, testObserver.Messages.Last().Value.Kind);
-            Assert.False(testObserver.Messages.Last().Value.Value);
+            Assert.Single(testObserver.Messages);
+            Assert.Equal(NotificationKind.OnNext, testObserver.Messages.Single().Value.Kind);
+            Assert.False(testObserver.Messages.Single().Value.Value);
         }
 
         [Fact]
@@ -100,24 +75,23 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         }
 
         [Fact]
-        public void SynchronizingSubscriptionsFailedHandler()
+        public void Disconnected_Observer()
         {
             using var mock = AutoMock.GetLoose();
-            mock.Mock<IManagedMqttClient>()
-                .SetupProperty(x => x.SynchronizingSubscriptionsFailedHandler);
+            mock.Mock<IManagedMqttClient>().SetupProperty(x => x.ConnectedHandler)
+            .SetupProperty(x => x.DisconnectedHandler);
             var rxMqttClinet = mock.Create<RxMqttClinet>();
 
             var testScheduler = new TestScheduler();
 
-            var @event = new ManagedProcessFailedEventArgs(new Exception());
-            testScheduler.ScheduleAsync(TimeSpan.FromTicks(2), (_, __) => mock.Mock<IManagedMqttClient>().Object.SynchronizingSubscriptionsFailedHandler.HandleSynchronizingSubscriptionsFailedAsync(@event));
-
+            testScheduler.ScheduleAsync(TimeSpan.FromTicks(2), (_, __) => mock.Mock<IManagedMqttClient>().Object.ConnectedHandler.HandleConnectedAsync(new MqttClientConnectedEventArgs(new MqttClientAuthenticateResult())));
+            testScheduler.ScheduleAsync(TimeSpan.FromTicks(3), (_, __) => mock.Mock<IManagedMqttClient>().Object.DisconnectedHandler.HandleDisconnectedAsync(new MqttClientDisconnectedEventArgs(true, new Exception(), new MqttClientAuthenticateResult(), MqttClientDisconnectReason.KeepaliveTimeout)));
             // act
-            var testObserver = testScheduler.Start(() => rxMqttClinet.SynchronizingSubscriptionsFailedEvent, 0, 0, 4);
+            var testObserver = testScheduler.Start(() => rxMqttClinet.Connected, 0, 0, 4);
 
-            Assert.Equal(1, testObserver.Messages.Count);
+            Assert.Equal(3, testObserver.Messages.Count);
             Assert.Equal(NotificationKind.OnNext, testObserver.Messages.Last().Value.Kind);
-            Assert.Equal(@event, testObserver.Messages.Last().Value.Value);
+            Assert.False(testObserver.Messages.Last().Value.Value);
         }
 
         [Fact]
@@ -139,6 +113,14 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         }
 
         [Fact]
+        public void Factory_NullException_With_Logger()
+        {
+            var looger = new MqttNetLogger("MyCustomId");
+            // act
+            Assert.Throws<ArgumentNullException>(() => ((MqttFactory)null).CreateRxMqttClient(looger));
+        }
+
+        [Fact]
         public void Factory_With_Logger()
         {
             var looger = new MqttNetLogger("MyCustomId");
@@ -148,14 +130,6 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             // test
             Assert.NotNull(client);
             Assert.IsType<RxMqttClinet>(client);
-        }
-
-        [Fact]
-        public void Factory_NullException_With_Logger()
-        {
-            var looger = new MqttNetLogger("MyCustomId");
-            // act
-            Assert.Throws<ArgumentNullException>(() => ((MqttFactory)null).CreateRxMqttClient(looger));
         }
 
         [Fact]
@@ -279,6 +253,27 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 
             // test
             mock.Mock<IManagedMqttClient>().Verify(x => x.StopAsync());
+        }
+
+        [Fact]
+        public void SynchronizingSubscriptionsFailedHandler()
+        {
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IManagedMqttClient>()
+                .SetupProperty(x => x.SynchronizingSubscriptionsFailedHandler);
+            var rxMqttClinet = mock.Create<RxMqttClinet>();
+
+            var testScheduler = new TestScheduler();
+
+            var @event = new ManagedProcessFailedEventArgs(new Exception());
+            testScheduler.ScheduleAsync(TimeSpan.FromTicks(2), (_, __) => mock.Mock<IManagedMqttClient>().Object.SynchronizingSubscriptionsFailedHandler.HandleSynchronizingSubscriptionsFailedAsync(@event));
+
+            // act
+            var testObserver = testScheduler.Start(() => rxMqttClinet.SynchronizingSubscriptionsFailedEvent, 0, 0, 4);
+
+            Assert.Equal(1, testObserver.Messages.Count);
+            Assert.Equal(NotificationKind.OnNext, testObserver.Messages.Last().Value.Kind);
+            Assert.Equal(@event, testObserver.Messages.Last().Value.Value);
         }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using Autofac.Extras.Moq;
 using Microsoft.Reactive.Testing;
-using MQTTnet;
 using MQTTnet.Extensions.ManagedClient;
-using MQTTnet.Extensions.External.RxMQTT.Client;
 using System;
 using System.Linq;
 using System.Reactive;
@@ -35,7 +33,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 
             // act
             var firstCount = 0;
-            var first = rxMqttClinet.Connect("T").Subscribe(_ => firstCount++); ;
+            var first = rxMqttClinet.Connect("T").Subscribe(_ => firstCount++);
 
             testScheduler.ScheduleAsync(TimeSpan.FromTicks(2), (_, __) => mock.Mock<IManagedMqttClient>().Object.ApplicationMessageReceivedHandler.HandleApplicationMessageReceivedAsync(eventArgs));
             testScheduler.ScheduleAbsolute(Unit.Default, 3, (_, __) =>

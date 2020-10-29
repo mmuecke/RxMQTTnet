@@ -1,5 +1,4 @@
-﻿using MQTTnet;
-using System;
+﻿using System;
 using System.Reactive.Linq;
 
 namespace MQTTnet.Extensions.External.RxMQTT.Client
