@@ -1,32 +1,22 @@
-﻿using MQTTnet;
-using MQTTnet.Client.Connecting;
+﻿using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Disconnecting;
-using MQTTnet.Client.Publishing;
 using MQTTnet.Extensions.ManagedClient;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MQTTnet.Extensions.RxMQTTnet
+namespace MQTTnet.Extensions.External.RxMQTT.Client
 {
     /// <summary>
     /// A rx mqtt client based on a <see cref="IManagedMqttClient"/>.
     /// </summary>
     /// <remarks>
     /// Use the <see cref="MqttFactoryExtensions.CreateRxMqttClient(IMqttFactory)"/> or
-    /// <see cref="MqttFactoryExtensions.CreateRxMqttClient(IMqttFactory, IMqttNetLogger)"/>
+    /// <see cref="MqttFactoryExtensions.CreateRxMqttClient(IMqttFactory, Diagnostics.IMqttNetLogger)"/>
     /// factory methods to crate the client.
     /// </remarks>
     public interface IRxMqttClinet : IApplicationMessagePublisher, IDisposable
     {
-        /// <summary>
-        /// Gets the internally used MQTT client.
-        /// </summary>
-        /// <remarks>
-        /// This property should be used with caution because manipulating the internal client might break the rx client.
-        /// </remarks>
-        IManagedMqttClient InternalClient { get; }
-
         /// <summary>
         /// Observer for the connection state of the client.
         /// </summary>
@@ -46,6 +36,14 @@ namespace MQTTnet.Extensions.RxMQTTnet
         /// Observer for the disconnected event.
         /// </summary>
         IObservable<MqttClientDisconnectedEventArgs> DisconnectedEvent { get; }
+
+        /// <summary>
+        /// Gets the internally used MQTT client.
+        /// </summary>
+        /// <remarks>
+        /// This property should be used with caution because manipulating the internal client might break the rx client.
+        /// </remarks>
+        IManagedMqttClient InternalClient { get; }
 
         /// <summary>
         /// The connection state of the client.
