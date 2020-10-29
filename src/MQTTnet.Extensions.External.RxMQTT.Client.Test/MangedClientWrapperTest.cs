@@ -91,7 +91,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             testScheduler.ScheduleAsync(TimeSpan.FromTicks(2), (_, __) => mock.Mock<IManagedMqttClient>().Object.ConnectingFailedHandler.HandleConnectingFailedAsync(@event));
 
             // act
-            var testObserver = testScheduler.Start(() => rxMqttClinet.ConnectingFailed, 0, 0, 4);
+            var testObserver = testScheduler.Start(() => rxMqttClinet.ConnectingFailedEvent, 0, 0, 4);
 
             Assert.Equal(1, testObserver.Messages.Count);
             Assert.Equal(NotificationKind.OnNext, testObserver.Messages.Last().Value.Kind);
@@ -112,7 +112,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             testScheduler.ScheduleAsync(TimeSpan.FromTicks(2), (_, __) => mock.Mock<IManagedMqttClient>().Object.SynchronizingSubscriptionsFailedHandler.HandleSynchronizingSubscriptionsFailedAsync(@event));
 
             // act
-            var testObserver = testScheduler.Start(() => rxMqttClinet.SynchronizingSubscriptionsFailed, 0, 0, 4);
+            var testObserver = testScheduler.Start(() => rxMqttClinet.SynchronizingSubscriptionsFailedEvent, 0, 0, 4);
 
             Assert.Equal(1, testObserver.Messages.Count);
             Assert.Equal(NotificationKind.OnNext, testObserver.Messages.Last().Value.Kind);
