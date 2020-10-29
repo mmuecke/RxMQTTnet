@@ -3,6 +3,7 @@ using MQTTnet;
 using MQTTnet.Protocol;
 using System;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Xunit;
 
@@ -147,6 +148,20 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             var observableResult = testScheduler.Start(() => observable, 0, 0, 1);
 
             Assert.Equal(message.Payload, observableResult.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnNext).First().Value.Value);
+        }
+
+        [Fact]
+        public void GetPayloadT_SourceException()
+        {
+            var observable = Observable
+                .Create<MqttApplicationMessageReceivedEventArgs>(o => { o.OnError(new Exception()); return Disposable.Empty; })
+                .GetPayload(p => p);
+
+            var testScheduler = new TestScheduler();
+
+            var observableResult = testScheduler.Start(() => observable, 0, 0, 1);
+
+            Assert.Single(observableResult.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnError));
         }
 
         [Theory]

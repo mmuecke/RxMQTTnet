@@ -16,6 +16,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using Xunit;
+using MQTTnet.Diagnostics;
 
 namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 {
@@ -128,6 +129,40 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             // test
             Assert.NotNull(client);
             Assert.IsType<RxMqttClinet>(client);
+        }
+
+        [Fact]
+        public void Factory_NullException()
+        {
+            // act
+            Assert.Throws<ArgumentNullException>(() => ((MqttFactory)null).CreateRxMqttClient());
+        }
+
+        [Fact]
+        public void Factory_With_Logger()
+        {
+            var looger = new MqttNetLogger("MyCustomId");
+            // act
+            var client = new MqttFactory().CreateRxMqttClient(looger);
+
+            // test
+            Assert.NotNull(client);
+            Assert.IsType<RxMqttClinet>(client);
+        }
+
+        [Fact]
+        public void Factory_NullException_With_Logger()
+        {
+            var looger = new MqttNetLogger("MyCustomId");
+            // act
+            Assert.Throws<ArgumentNullException>(() => ((MqttFactory)null).CreateRxMqttClient(looger));
+        }
+
+        [Fact]
+        public void Factory_With_Logger_NullException()
+        {
+            // act
+            Assert.Throws<ArgumentNullException>(() => new MqttFactory().CreateRxMqttClient(null));
         }
 
         [Fact]

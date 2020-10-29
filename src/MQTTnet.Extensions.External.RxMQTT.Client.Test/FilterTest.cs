@@ -26,10 +26,22 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         [InlineData("Test/Pre", "Test/Pre/Te/T", false)]
         [InlineData("Test/Te/T/Pre", "Test/Te/T/Pre", true)]
         [InlineData("Test/Te/T/Pre", "Test/Te/T/", false)]
-        public void Topic(string topicFilter, string topicRecived, bool result)
+        public void Topic_IsTopicMatch(string topicFilter, string topicRecived, bool result)
         {
             var filter = new TopicFilter(topicFilter);
             Assert.Equal(result, filter.IsTopicMatch(topicRecived));
+        }
+
+        [Fact]
+        public void Topic_Set()
+        {
+            var topic = "Topic";
+
+            // act
+            var filter = new TopicFilter(topic);
+
+            // test
+            Assert.Equal(topic, filter.Topic);
         }
     }
 }
