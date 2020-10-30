@@ -32,14 +32,13 @@ jobs:
       uses: dotnet/nbgv@master      
       with:
         setAllVars: true
-        path: src
 
     - name: Restore
       run: dotnet restore
       working-directory: src      
 
     - name: Build
-      run: dotnet build -v:minimal -c:${{ env.configuration }}
+      run: dotnet build -v:minimal -c:${{ env.configuration }} -v:${{ env.NBGV_CloudBuildNumber }}
       working-directory: src
 
     - name: Pack
