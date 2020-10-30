@@ -29,9 +29,10 @@ jobs:
 
     - name: NBGV
       id: nbgv
-      uses: dotnet/nbgv@master
+      uses: dotnet/nbgv@master      
       with:
         setAllVars: true
+        directory: src
 
     - name: Restore
       run: dotnet restore
