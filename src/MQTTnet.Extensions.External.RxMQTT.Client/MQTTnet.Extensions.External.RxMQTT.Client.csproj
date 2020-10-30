@@ -6,6 +6,12 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Authors>mmuecke</Authors>
+    <Description>A extension to the MQTTnet ManagedMqttClient , to transform the subscriptions into observables.</Description>
+    <Copyright>MIT</Copyright>
+    <PackageProjectUrl>https://github.com/mmuecke/RxMQTTnet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/mmuecke/RxMQTTnet</RepositoryUrl>
+    <PackageTags>mqtt;mqttclient;rx</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
