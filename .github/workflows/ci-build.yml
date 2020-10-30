@@ -38,14 +38,18 @@ jobs:
       working-directory: src      
 
     - name: Build
-      run: dotnet pack -p:NoPackageAnalysis=true -v:minimal -c:${{ env.configuration }}
+      run: dotnet build -v:minimal -c:${{ env.configuration }}
+      working-directory: src
+
+    - name: Pack
+      run: dotnet pack --no-build -p:NoPackageAnalysis=true -v:minimal -c:${{ env.configuration }}
       working-directory: src
 
     - name: Install Report Generator
       run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
     - name: Run Unit Tests
-      run: dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput="../../artifacts/coverage/coverage.xml" /p:Include="[${{ env.productNamespacePrefix}}*]*" /p:Exclude="[${{ env.productNamespacePrefix}}*Tests.*]*"
+      run: dotnet test --no-build -c:${{ env.configuration }} /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput="../../artifacts/coverage/coverage.xml" /p:Include="[${{ env.productNamespacePrefix}}*]*"
       working-directory: src
 
     - name: Generate Coverage Report
