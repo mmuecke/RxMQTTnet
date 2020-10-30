@@ -32,7 +32,7 @@ jobs:
       uses: dotnet/nbgv@master      
       with:
         setAllVars: true
-        directory: src
+        path: src
 
     - name: Restore
       run: dotnet restore
