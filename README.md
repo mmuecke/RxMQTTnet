@@ -1,10 +1,5 @@
 ![Build](https://github.com/mmuecke/RxMQTTnet/workflows/Build/badge.svg) [![Code Coverage](https://codecov.io/gh/mmuecke/RxMQTTnet/branch/master/graph/badge.svg)](https://codecov.io/gh/mmuecke/RxMQTTnet)
 [![NuGet Stats](https://img.shields.io/nuget/v/MQTTnet.Extensions.External.RxMQTT.Client.svg)](https://www.nuget.org/packages/MQTTnet.Extensions.External.RxMQTT.Client) ![Downloads](https://img.shields.io/nuget/dt/MQTTnet.Extensions.External.RxMQTT.Client.svg)
-<br />
-<br />
-<a href="https://github.com/reactiveui/DynamicData">
-        <img width="170" height="170" src="https://github.com/reactiveui/styleguide/blob/master/logo_dynamic_data/logo.svg"/>
-</a>
 
 # RxMQTTnet
 A extension to the [MQTTnet](https://github.com/chkr1011/MQTTnet) project, to transform the subscriptions into observables.
