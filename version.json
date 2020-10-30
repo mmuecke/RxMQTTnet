@@ -11,7 +11,7 @@
       "SetAllVariables": true,
 		"SetVersionVariables": true,
 		"BuildNumber": {
-			"Enabled": false
+			"Enabled": true
 		}
 	}
 }
