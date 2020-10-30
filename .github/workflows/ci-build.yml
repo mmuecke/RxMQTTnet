@@ -35,13 +35,10 @@ jobs:
 
     - name: NuGet Restore
       run: dotnet restore
-      working-directory: src
-      
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
+      working-directory: src      
 
     - name: Build
-      run: msbuild /t:build,pack /maxcpucount /p:NoPackageAnalysis=true /verbosity:minimal /p:Configuration=${{ env.configuration }}
+      run: dotnet pack -p:NoPackageAnalysis=true -v:minimal -c:${{ env.configuration }}
       working-directory: src
 
     - name: Install Report Generator
