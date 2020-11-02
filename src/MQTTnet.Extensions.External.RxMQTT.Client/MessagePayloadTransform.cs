@@ -16,6 +16,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             this.skipOnError = skipOnError;
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Exception is forwarded to subscriber.")]
         public IObservable<T> Run()
         {
             return Observable.Create<T>(observer =>

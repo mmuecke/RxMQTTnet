@@ -45,7 +45,9 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             this.logger = logger.CreateScopedLogger(nameof(RxMqttClinet));
             topicSubscriptionCache = new Dictionary<string, IObservable<MqttApplicationMessageReceivedEventArgs>>();
 
+#pragma warning disable CA2000 // Dispose objects before losing scope
             var cancelationSubject = new Subject<Unit>();
+#pragma warning restore CA2000 // Dispose objects before losing scope
 
             ConnectedEvent = CrateFromHandler<MqttClientConnectedEventArgs>(observer =>
                 {
@@ -137,8 +139,10 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// <inheritdoc/>
         public IObservable<ManagedProcessFailedEventArgs> SynchronizingSubscriptionsFailedEvent { get; }
 
+
         /// <inheritdoc/>
         /// <exception cref="ArgumentException"></exception>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Logged or forwarded.")]
         public IObservable<MqttApplicationMessageReceivedEventArgs> Connect(string topic)
         {
             if (string.IsNullOrWhiteSpace(topic))
@@ -181,7 +185,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                                     }
                                     try
                                     {
-                                        await InternalClient.UnsubscribeAsync(topic);
+                                        await InternalClient.UnsubscribeAsync(topic).ConfigureAwait(false);
                                     }
                                     catch (ObjectDisposedException) { } // if disposed there is nothing to unsubscribe
                                     catch (Exception exception)
@@ -218,11 +222,11 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentNullException"></exception>
-        public Task PublishAsync(ManagedMqttApplicationMessage applicationMessages)
+        public Task PublishAsync(ManagedMqttApplicationMessage applicationMessage)
         {
-            if (applicationMessages is null) throw new ArgumentNullException(nameof(applicationMessages));
+            if (applicationMessage is null) throw new ArgumentNullException(nameof(applicationMessage));
 
-            return InternalClient.PublishAsync(applicationMessages);
+            return InternalClient.PublishAsync(applicationMessage);
         }
 
         /// <inheritdoc/>
