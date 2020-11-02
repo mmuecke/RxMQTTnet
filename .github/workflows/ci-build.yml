@@ -38,7 +38,7 @@ jobs:
       working-directory: src      
 
     - name: Build
-      run: dotnet build -v:minimal -c:${{ env.configuration }} -p:Version=${{ env.NBGV_CloudBuildNumber }}
+      run: dotnet build -v:minimal -c:${{ env.configuration }} 
       working-directory: src
 
     - name: Pack

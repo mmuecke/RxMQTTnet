@@ -1,22 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Title>RxMQTTClient</Title>
     <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.1</TargetFrameworks>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Authors>mmuecke</Authors>
-    <Description>A extension to the MQTTnet ManagedMqttClient , to transform the subscriptions into observables.</Description>
-    <Copyright>MIT</Copyright>
-    <PackageProjectUrl>https://github.com/mmuecke/RxMQTTnet</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/mmuecke/RxMQTTnet</RepositoryUrl>
-    <PackageTags>mqtt;mqttclient;rx</PackageTags>
+    <Description>A extension to the MQTTnet ManagedMqttClient, to transform the subscriptions into observables.</Description>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="3.0.13" />
