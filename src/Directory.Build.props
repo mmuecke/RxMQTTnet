@@ -7,9 +7,9 @@
     <IsTestProject>$(MSBuildProjectName.Contains('.Tests'))</IsTestProject>
     <DebugType>embedded</DebugType>
         
-    <Authors>Markus Mücke</Authors>
-    <Owners>Markus Mücke</Owners>
-    <Copyright>Copyright (c) Markus Mücke 2020</Copyright>
+    <Authors>Markus Muecke</Authors>
+    <Owners>Markus Muecke</Owners>
+    <Copyright>Copyright (c) Markus Muecke 2020</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/mmuecke/RxMQTTnet</PackageProjectUrl>
     <PackageIconUrl></PackageIconUrl>
