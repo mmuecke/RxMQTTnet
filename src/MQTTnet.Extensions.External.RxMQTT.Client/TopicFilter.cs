@@ -15,13 +15,17 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// </summary>
         /// <remarks>Wildcards '#' and '+' are allowed.</remarks>
         /// <param name="topic">The topic to filter for.</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1307", Justification = "No overload found")]
         public TopicFilter(string topic)
         {
+            if (string.IsNullOrWhiteSpace(topic))
+                throw new System.ArgumentException($"'{nameof(topic)}' cannot be null or whitespace", nameof(topic));
+
             Topic = topic;
             var topicRegexStrings = topic
-                         .Replace(@"/", @"\/")
-                         .Replace("+", @"([a-zA-Z0-9]+)?")
-                         .Replace("#", @"[a-zA-Z0-9\/]+");
+                    .Replace("/", @"\/")
+                    .Replace("+", "([a-zA-Z0-9]+)?")
+                    .Replace("#", @"[a-zA-Z0-9\/]+");
 
             topicRegex = new Regex("^" + topicRegexStrings + "$");
         }

@@ -29,26 +29,27 @@ jobs:
 
     - name: NBGV
       id: nbgv
-      uses: dotnet/nbgv@master
+      uses: dotnet/nbgv@master      
       with:
         setAllVars: true
 
-    - name: NuGet Restore
+    - name: Restore
       run: dotnet restore
-      working-directory: src
-      
-    - name: Add MSBuild to PATH
-      uses: microsoft/setup-msbuild@v1.0.2
+      working-directory: src      
 
     - name: Build
-      run: msbuild /t:build,pack /maxcpucount /p:NoPackageAnalysis=true /verbosity:minimal /p:Configuration=${{ env.configuration }}
+      run: dotnet build -v:minimal -c:${{ env.configuration }} 
+      working-directory: src
+
+    - name: Pack
+      run: dotnet pack --no-build -v:minimal -c:${{ env.configuration }}
       working-directory: src
 
     - name: Install Report Generator
       run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
     - name: Run Unit Tests
-      run: dotnet test --no-build /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput="../../artifacts/coverage/coverage.xml" /p:Include="[${{ env.productNamespacePrefix}}*]*" /p:Exclude="[${{ env.productNamespacePrefix}}*Tests.*]*"
+      run: dotnet test --no-build -c:${{ env.configuration }} -p:CollectCoverage=true -p:CoverletOutputFormat=cobertura -p:CoverletOutput="../../artifacts/coverage/coverage.xml" -p:Include="[${{ env.productNamespacePrefix}}*]*"
       working-directory: src
 
     - name: Generate Coverage Report
@@ -58,7 +59,7 @@ jobs:
     - name: Upload Code Coverage
       uses: codecov/codecov-action@v1
       with:
-        token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+        token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos, otherwise set api token in repository secrets
         directory: artifacts/coverage
 
     - name: Create NuGet Artifacts
@@ -98,7 +99,7 @@ jobs:
 
     - name: NuGet Push
       env:
-        NUGET_AUTH_TOKEN: ${{ secrets.NUGET_API_KEY }}
+        NUGET_AUTH_TOKEN: ${{ secrets.NUGET_API_KEY }} # Set nuget api token in repository secrets
         SOURCE_URL: https://api.nuget.org/v3/index.json
       run: |
         dotnet nuget push -s ${{ env.SOURCE_URL }} -k ${{ env.NUGET_AUTH_TOKEN }} **/*.nupkg
