@@ -2,11 +2,11 @@
 
 <Project>
   <PropertyGroup>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Platform>AnyCPU</Platform>
-    <IsTestProject>$(MSBuildProjectName.Contains('.Tests'))</IsTestProject>
-    <DebugType>embedded</DebugType>
-        
+    <IsTestProject>$(MSBuildProjectName.Contains('.Test'))</IsTestProject>
+    <DebugType>embedded</DebugType>        
+    <GenerateDocumentationFile  Condition="!$(IsTestProject)">true</GenerateDocumentationFile>
+    
     <Authors>Markus Muecke</Authors>
     <Owners>Markus Muecke</Owners>
     <Copyright>Copyright (c) Markus Muecke 2020</Copyright>
