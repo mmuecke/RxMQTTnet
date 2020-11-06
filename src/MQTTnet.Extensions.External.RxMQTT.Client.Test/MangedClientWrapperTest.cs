@@ -75,6 +75,27 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         }
 
         [Fact]
+        public void CTOR_ArgumentNullException_Logger()
+        {
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IManagedMqttClient>();
+            var managedMqttClient = mock.Create<IManagedMqttClient>(); ;
+            IMqttNetLogger logger = null;
+            Assert.Throws<ArgumentNullException>(() => new RxMqttClinet(managedMqttClient, logger));
+        }
+
+        [Fact]
+        public void CTOR_ArgumentNullException_ManagedMqttClient()
+        {
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IMqttNetLogger>();
+            IManagedMqttClient managedMqttClient = null;
+            var logger = mock.Create<IMqttNetLogger>();
+
+            Assert.Throws<ArgumentNullException>(() => new RxMqttClinet(managedMqttClient, logger));
+        }
+
+        [Fact]
         public void Disconnected_Observer()
         {
             using var mock = AutoMock.GetLoose();

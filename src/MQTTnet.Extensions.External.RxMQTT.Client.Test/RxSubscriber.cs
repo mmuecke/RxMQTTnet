@@ -13,6 +13,18 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 {
     public class RxSubscriber
     {
+        [Theory]
+        [InlineData(" ")]
+        [InlineData("")]
+        [InlineData(null)]
+        public void Connect_ArguemntException(string topic)
+        {
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IManagedMqttClient>();
+            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            Assert.Throws<ArgumentException>(() => rxMqttClinet.Connect(topic));
+        }
+
         [Fact]
         public void Publisch_2Subscribe_2Recive_1Dispose_1Recive_Dispose()
         {
