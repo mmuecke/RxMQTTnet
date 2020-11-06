@@ -42,6 +42,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         {
             InternalClient = managedMqttClient ?? throw new ArgumentNullException(nameof(managedMqttClient));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
+
             this.logger = logger.CreateScopedLogger(nameof(RxMqttClinet));
             topicSubscriptionCache = new Dictionary<string, IObservable<MqttApplicationMessageReceivedEventArgs>>();
 
