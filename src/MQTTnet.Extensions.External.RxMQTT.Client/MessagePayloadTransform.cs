@@ -11,8 +11,8 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
 
         public MessagePayloadTransform(IObservable<MqttApplicationMessage> source, Func<byte[], T> getPayloadFunc, bool skipOnError)
         {
-            this.source = source;
-            this.getPayloadFunc = getPayloadFunc;
+            this.source = source ?? throw new ArgumentNullException(nameof(source));
+            this.getPayloadFunc = getPayloadFunc ?? throw new ArgumentNullException(nameof(getPayloadFunc));
             this.skipOnError = skipOnError;
         }
 
