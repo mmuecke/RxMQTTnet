@@ -7,11 +7,10 @@
 	"NuGetPackageVersion": {
 		"semVer": 2
 	},
-	"CloudBuild": {		
-      "SetAllVariables": true,
+	"CloudBuild": {
 		"SetVersionVariables": true,
 		"BuildNumber": {
-			"Enabled": true
+			"Enabled": false
 		}
 	}
 }
