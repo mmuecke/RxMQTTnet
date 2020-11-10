@@ -42,6 +42,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         {
             InternalClient = managedMqttClient ?? throw new ArgumentNullException(nameof(managedMqttClient));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
+
             this.logger = logger.CreateScopedLogger(nameof(RxMqttClinet));
             topicSubscriptionCache = new Dictionary<string, IObservable<MqttApplicationMessageReceivedEventArgs>>();
 
@@ -52,20 +53,20 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             ConnectedEvent = CrateFromHandler<MqttClientConnectedEventArgs>(observer =>
                 {
                     managedMqttClient.UseConnectedHandler(args => observer.OnNext(args));
-                    return Disposable.Create(() => managedMqttClient.UseConnectedHandler(_ => null));
+                    return Disposable.Create(() => managedMqttClient.ConnectedHandler = null);
                 });
 
             DisconnectedEvent = CrateFromHandler<MqttClientDisconnectedEventArgs>(observer =>
                 {
                     managedMqttClient.UseDisconnectedHandler(args => observer.OnNext(args));
-                    return Disposable.Create(() => managedMqttClient.UseDisconnectedHandler(_ => null));
+                    return Disposable.Create(() => managedMqttClient.DisconnectedHandler = null);
                 });
 
             ConnectingFailedEvent = CrateFromHandler<ManagedProcessFailedEventArgs>(observer =>
                 {
                     managedMqttClient.ConnectingFailedHandler = new ConnectingFailedHandlerDelegate(args => observer.OnNext(args));
                     return Disposable.Create(() => managedMqttClient.ConnectingFailedHandler = null);
-                }); ;
+                });
 
             SynchronizingSubscriptionsFailedEvent = CrateFromHandler<ManagedProcessFailedEventArgs>(observer =>
                 {
@@ -78,12 +79,11 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                 {
                     var connected = ConnectedEvent.Subscribe(_ => observer.OnNext(true));
                     var disconnected = DisconnectedEvent.Subscribe(_ => observer.OnNext(false));
-
                     return new CompositeDisposable(connected, disconnected);
                 })
                 .TakeUntil(cancelationSubject)      // complete on dispose
                 .Prepend(IsConnected)               // start with current state
-                .Concat(Observable.Return(false))   // finish with false
+                .Append(false)                      // finish with false
                 .Replay(1)                          // replay last state on subscribe
                 .RefCount();                        // count subscriptions and dispose source observable when no subscription
 
@@ -99,7 +99,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                     .TakeUntil(cancelationSubject)  // complete on dispose
                     .Publish()                      // publish from on source observable
                     .RefCount();                    // count subscriptions and dispose source observable when no subscription
-            };
+            }
 
             cleanUp = Disposable.Create(() =>
             {
@@ -139,7 +139,6 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// <inheritdoc/>
         public IObservable<ManagedProcessFailedEventArgs> SynchronizingSubscriptionsFailedEvent { get; }
 
-
         /// <inheritdoc/>
         /// <exception cref="ArgumentException"></exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Logged or forwarded.")]
@@ -165,6 +164,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                             }
                             catch (Exception exception)
                             {
+                                logger.Error(exception, "Error while maintaining subscribe from topic.");
                                 observer.OnError(exception);
                                 return Disposable.Empty;
                             }
@@ -190,7 +190,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                                     catch (ObjectDisposedException) { } // if disposed there is nothing to unsubscribe
                                     catch (Exception exception)
                                     {
-                                        logger.Error(exception, "Error exception while maintaining unsubscribe from topic.");
+                                        logger.Error(exception, "Error while maintaining unsubscribe from topic.");
                                     }
                                 });
                         })

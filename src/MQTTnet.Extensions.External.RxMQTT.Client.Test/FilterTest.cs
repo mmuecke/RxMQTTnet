@@ -1,9 +1,19 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 
 namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 {
     public class FilterTest
     {
+        [Theory]
+        [InlineData(" ")]
+        [InlineData("")]
+        [InlineData(null)]
+        public void Topic_ArgumentException(string topicFilter)
+        {
+            Assert.Throws<ArgumentException>(() => new TopicFilter(topicFilter));
+        }
+
         [Theory]
         [InlineData("Test/Pre", "Test/Pre", true)]
         [InlineData("Test/Pre", "Test/Pre/Te/T", false)]

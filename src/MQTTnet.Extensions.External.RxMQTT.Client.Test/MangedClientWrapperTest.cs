@@ -15,6 +15,22 @@ using Xunit;
 
 namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 {
+    // the function is testet via the public extension methods
+    public class MessagePayloadTransformTest
+    {
+        [Fact]
+        public void CTOR_ArgumentNullExcepoin()
+        {
+            Assert.Throws<ArgumentNullException>(() => new MessagePayloadTransform<byte[]>(null, p => p, false));
+        }
+
+        [Fact]
+        public void CTOR_ArgumentNullExcepoin_GetPayloadFunc()
+        {
+            Assert.Throws<ArgumentNullException>(() => new MessagePayloadTransform<byte[]>(Observable.Never<MqttApplicationMessage>(), null, false));
+        }
+    }
+
     public class MangedClientWrapperTest
     {
         [Fact]
@@ -33,6 +49,9 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             Assert.Equal(2, testObserver.Messages.Count);
             Assert.Equal(NotificationKind.OnNext, testObserver.Messages.Last().Value.Kind);
             Assert.True(testObserver.Messages.Last().Value.Value);
+            testScheduler.AdvanceBy(1);
+            Assert.Null(rxMqttClinet.InternalClient.ConnectedHandler);
+            Assert.Null(rxMqttClinet.InternalClient.DisconnectedHandler);
         }
 
         [Fact]
@@ -72,6 +91,29 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             Assert.Equal(1, testObserver.Messages.Count);
             Assert.Equal(NotificationKind.OnNext, testObserver.Messages.Last().Value.Kind);
             Assert.Equal(@event, testObserver.Messages.Last().Value.Value);
+
+            Assert.Null(rxMqttClinet.InternalClient.ConnectingFailedHandler);
+        }
+
+        [Fact]
+        public void CTOR_ArgumentNullException_Logger()
+        {
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IManagedMqttClient>();
+            var managedMqttClient = mock.Create<IManagedMqttClient>(); ;
+            IMqttNetLogger logger = null;
+            Assert.Throws<ArgumentNullException>(() => new RxMqttClinet(managedMqttClient, logger));
+        }
+
+        [Fact]
+        public void CTOR_ArgumentNullException_ManagedMqttClient()
+        {
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IMqttNetLogger>();
+            IManagedMqttClient managedMqttClient = null;
+            var logger = mock.Create<IMqttNetLogger>();
+
+            Assert.Throws<ArgumentNullException>(() => new RxMqttClinet(managedMqttClient, logger));
         }
 
         [Fact]
@@ -92,6 +134,8 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             Assert.Equal(3, testObserver.Messages.Count);
             Assert.Equal(NotificationKind.OnNext, testObserver.Messages.Last().Value.Kind);
             Assert.False(testObserver.Messages.Last().Value.Value);
+            Assert.Null(rxMqttClinet.InternalClient.ConnectedHandler);
+            Assert.Null(rxMqttClinet.InternalClient.DisconnectedHandler);
         }
 
         [Fact]
@@ -166,6 +210,23 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         }
 
         [Fact]
+        public void PendingApplicationMessagesCount()
+        {
+            var count = 10;
+            using var mock = AutoMock.GetLoose();
+
+            mock.Mock<IManagedMqttClient>()
+                .Setup(x => x.PendingApplicationMessagesCount)
+                .Returns(count);
+
+            // act
+            var rxMqttClinet = mock.Create<RxMqttClinet>();
+
+            // test
+            Assert.Equal(count, rxMqttClinet.PendingApplicationMessagesCount);
+        }
+
+        [Fact]
         public async void PingAsync()
         {
             using var mock = AutoMock.GetLoose();
@@ -180,6 +241,62 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 
             // test
             mock.Mock<IManagedMqttClient>().Verify(x => x.PingAsync(cts));
+        }
+
+        [Fact]
+        public async void PublishAsync()
+        {
+            using var mock = AutoMock.GetLoose();
+            var message = new ManagedMqttApplicationMessage();
+
+            mock.Mock<IManagedMqttClient>();
+            var rxMqttClinet = mock.Create<RxMqttClinet>();
+
+            // act
+            await rxMqttClinet.PublishAsync(message);
+
+            // test
+            mock.Mock<IManagedMqttClient>().Verify(x => x.PublishAsync(message));
+        }
+
+        [Fact]
+        public void PublishAsync_ArgumentNullException()
+        {
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IManagedMqttClient>();
+            RxMqttClinet rxMqttClinet = mock.Create<RxMqttClinet>();
+
+            // act
+            _ = Assert.ThrowsAsync<ArgumentNullException>(() => rxMqttClinet.PublishAsync(null));
+        }
+
+        [Fact]
+        public async void PublishAsync_CancellationToken()
+        {
+            using var mock = AutoMock.GetLoose();
+            var ct = new CancellationToken();
+            var message = new MqttApplicationMessage();
+
+            mock.Mock<IManagedMqttClient>();
+            var rxMqttClinet = mock.Create<RxMqttClinet>();
+
+            // act
+            await rxMqttClinet.PublishAsync(message, ct);
+
+            // test
+            mock.Mock<IManagedMqttClient>().Verify(x => x.PublishAsync(message, ct));
+        }
+
+        [Fact]
+        public void PublishAsync_CancellationToken_ArgumentNullException()
+        {
+            using var mock = AutoMock.GetLoose();
+            var ct = new CancellationToken();
+            mock.Mock<IManagedMqttClient>();
+            var rxMqttClinet = mock.Create<RxMqttClinet>();
+
+            // act
+            _ = Assert.ThrowsAsync<ArgumentNullException>(() => rxMqttClinet.PublishAsync(null, ct));
         }
 
         [Theory]
@@ -241,6 +358,17 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         }
 
         [Fact]
+        public void StartAsync_ArgumentNullException()
+        {
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IManagedMqttClient>();
+            var rxMqttClinet = mock.Create<RxMqttClinet>();
+
+            // act
+            _ = Assert.ThrowsAsync<ArgumentNullException>(() => rxMqttClinet.StartAsync(null));
+        }
+
+        [Fact]
         public async void StopAsync()
         {
             using var mock = AutoMock.GetLoose();
@@ -274,6 +402,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             Assert.Equal(1, testObserver.Messages.Count);
             Assert.Equal(NotificationKind.OnNext, testObserver.Messages.Last().Value.Kind);
             Assert.Equal(@event, testObserver.Messages.Last().Value.Value);
+            Assert.Null(rxMqttClinet.InternalClient.SynchronizingSubscriptionsFailedHandler);
         }
     }
 }

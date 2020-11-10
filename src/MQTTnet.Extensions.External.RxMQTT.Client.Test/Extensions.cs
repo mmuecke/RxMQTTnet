@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Text;
 using Xunit;
 
 namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
@@ -13,27 +14,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         [Theory]
         [InlineData(MqttQualityOfServiceLevel.ExactlyOnce, true)]
         [InlineData(MqttQualityOfServiceLevel.AtLeastOnce, false)]
-        public void FilterQoSApplicationMessage(MqttQualityOfServiceLevel filter, bool success)
-        {
-            var message = new MqttApplicationMessageBuilder()
-                .WithExactlyOnceQoS()
-                .WithTopic("T")
-                .WithPayload("P")
-                .Build();
-
-            var observable = Observable.Return(message).FilterQoS(filter);
-
-            var testScheduler = new TestScheduler();
-
-            var observableResult = testScheduler.Start(() => observable, 0, 0, 1);
-
-            Assert.Equal(success, observableResult.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnNext).Any());
-        }
-
-        [Theory]
-        [InlineData(MqttQualityOfServiceLevel.ExactlyOnce, true)]
-        [InlineData(MqttQualityOfServiceLevel.AtLeastOnce, false)]
-        public void FilterQoSEvent(MqttQualityOfServiceLevel filter, bool success)
+        public void FilterQoS_ApplicationEvent(MqttQualityOfServiceLevel filter, bool success)
         {
             var message = new MqttApplicationMessageBuilder()
                 .WithExactlyOnceQoS()
@@ -51,10 +32,44 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             Assert.Equal(success, observableResult.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnNext).Any());
         }
 
+        [Fact]
+        public void FilterQoS_ApplicationEvent_ArgumentNullException()
+        {
+            IObservable<MqttApplicationMessageReceivedEventArgs> observable = null;
+            Assert.Throws<ArgumentNullException>(() => observable.FilterQoS(MqttQualityOfServiceLevel.ExactlyOnce));
+        }
+
+        [Theory]
+        [InlineData(MqttQualityOfServiceLevel.ExactlyOnce, true)]
+        [InlineData(MqttQualityOfServiceLevel.AtLeastOnce, false)]
+        public void FilterQoS_ApplicationMessage(MqttQualityOfServiceLevel filter, bool success)
+        {
+            var message = new MqttApplicationMessageBuilder()
+                .WithExactlyOnceQoS()
+                .WithTopic("T")
+                .WithPayload("P")
+                .Build();
+
+            var observable = Observable.Return(message).FilterQoS(filter);
+
+            var testScheduler = new TestScheduler();
+
+            var observableResult = testScheduler.Start(() => observable, 0, 0, 1);
+
+            Assert.Equal(success, observableResult.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnNext).Any());
+        }
+
+        [Fact]
+        public void FilterQoS_ApplicationMessage_ArgumentNullException()
+        {
+            IObservable<MqttApplicationMessage> observable = null;
+            Assert.Throws<ArgumentNullException>(() => observable.FilterQoS(MqttQualityOfServiceLevel.ExactlyOnce));
+        }
+
         [Theory]
         [InlineData("T", true)]
         [InlineData("N", false)]
-        public void FilterTopicApplicationEvent(string filter, bool success)
+        public void FilterTopic_ApplicationEvent(string filter, bool success)
         {
             var message = new MqttApplicationMessageBuilder()
                 .WithExactlyOnceQoS()
@@ -71,10 +86,26 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             Assert.Equal(success, observableResult.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnNext).Any());
         }
 
+        [Fact]
+        public void FilterTopic_ApplicationEvent_ArgumentNullException()
+        {
+            IObservable<MqttApplicationMessageReceivedEventArgs> observable = null;
+            Assert.Throws<ArgumentNullException>(() => observable.FilterTopic("Filter"));
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(" ")]
+        [InlineData(null)]
+        public void FilterTopic_ApplicationEvent_ArgumentNullException_Filter(string topic)
+        {
+            Assert.Throws<ArgumentException>(() => Observable.Never<MqttApplicationMessageReceivedEventArgs>().FilterTopic(topic));
+        }
+
         [Theory]
         [InlineData("T", true)]
         [InlineData("N", false)]
-        public void FilterTopicApplicationMessage(string filter, bool success)
+        public void FilterTopic_ApplicationMessage(string filter, bool success)
         {
             var message = new MqttApplicationMessageBuilder()
                 .WithExactlyOnceQoS()
@@ -93,7 +124,61 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         }
 
         [Fact]
-        public void GetMessage()
+        public void FilterTopic_ApplicationMessage_ArgumentNullException()
+        {
+            IObservable<MqttApplicationMessage> observable = null;
+            Assert.Throws<ArgumentNullException>(() => observable.FilterTopic("Filter"));
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(" ")]
+        [InlineData(null)]
+        public void FilterTopic_ApplicationMessage_ArgumentNullException_Filter(string topic)
+        {
+            Assert.Throws<ArgumentException>(() => Observable.Never<MqttApplicationMessage>().FilterTopic(topic));
+        }
+
+        [Fact]
+        public void GetPayload()
+        {
+            var message = new MqttApplicationMessageBuilder()
+                .WithExactlyOnceQoS()
+                .WithTopic("T")
+                .WithPayload("P")
+                .Build();
+            var @event = new MqttApplicationMessageReceivedEventArgs("C", message);
+
+            var observable = Observable.Return(@event).SelectPayload();
+
+            var testScheduler = new TestScheduler();
+
+            var observableResult = testScheduler.Start(() => observable, 0, 0, 1);
+
+            Assert.Equal("P", observableResult.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnNext).First().Value.Value);
+        }
+
+        [Fact]
+        public void GetPayload_T_FromEvent()
+        {
+            var message = new MqttApplicationMessageBuilder()
+                .WithExactlyOnceQoS()
+                .WithTopic("T")
+                .WithPayload("P")
+                .Build();
+            var @event = new MqttApplicationMessageReceivedEventArgs("C", message);
+
+            var observable = Observable.Return(@event).SelectPayload(p => p);
+
+            var testScheduler = new TestScheduler();
+
+            var observableResult = testScheduler.Start(() => observable, 0, 0, 1);
+
+            Assert.Equal(message.Payload, observableResult.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnNext).First().Value.Value);
+        }
+
+        [Fact]
+        public void SelectMessage()
         {
             var message = new MqttApplicationMessageBuilder()
                 .WithExactlyOnceQoS()
@@ -112,47 +197,65 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         }
 
         [Fact]
-        public void GetPayload()
+        public void SelectMessage_ArgumentNullException()
         {
-            var message = new MqttApplicationMessageBuilder()
-                .WithExactlyOnceQoS()
-                .WithTopic("T")
-                .WithPayload("P")
-                .Build();
-            var @event = new MqttApplicationMessageReceivedEventArgs("C", message);
+            IObservable<MqttApplicationMessageReceivedEventArgs> observable = null;
 
-            var observable = Observable.Return(@event).GetPayload();
-
-            var testScheduler = new TestScheduler();
-
-            var observableResult = testScheduler.Start(() => observable, 0, 0, 1);
-
-            Assert.Equal("P", observableResult.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnNext).First().Value.Value);
+            Assert.Throws<ArgumentNullException>(() => observable.SelectMessage());
         }
 
         [Fact]
-        public void GetPayloadT()
+        public void SelectPayload_FromEvent_ArgumentNullException()
         {
-            var message = new MqttApplicationMessageBuilder()
-                .WithExactlyOnceQoS()
-                .WithTopic("T")
-                .WithPayload("P")
-                .Build();
-            var @event = new MqttApplicationMessageReceivedEventArgs("C", message);
+            IObservable<MqttApplicationMessageReceivedEventArgs> observable = null;
 
-            var observable = Observable.Return(@event).GetPayload(p => p);
+            Assert.Throws<ArgumentNullException>(() => observable.SelectPayload());
+        }
 
-            var testScheduler = new TestScheduler();
+        [Fact]
+        public void SelectPayload_FromEvent_T_ArgumentNullException()
+        {
+            IObservable<MqttApplicationMessageReceivedEventArgs> observable = null;
 
-            var observableResult = testScheduler.Start(() => observable, 0, 0, 1);
+            Assert.Throws<ArgumentNullException>(() => observable.SelectPayload(p => p));
+        }
 
-            Assert.Equal(message.Payload, observableResult.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnNext).First().Value.Value);
+        [Fact]
+        public void SelectPayload_FromEvent_T_ArgumentNullException_GetPayloadFunc()
+        {
+            Func<byte[], byte[]> getPayloadFunc = null;
+
+            Assert.Throws<ArgumentNullException>(() => Observable.Never<MqttApplicationMessageReceivedEventArgs>().SelectPayload(getPayloadFunc));
+        }
+
+        [Fact]
+        public void SelectPayload_FromMessage_ArgumentNullException()
+        {
+            IObservable<MqttApplicationMessage> observable = null;
+
+            Assert.Throws<ArgumentNullException>(() => observable.SelectPayload());
+        }
+
+        [Fact]
+        public void SelectPayload_FromMessage_T_ArgumentNullException()
+        {
+            IObservable<MqttApplicationMessage> observable = null;
+
+            Assert.Throws<ArgumentNullException>(() => observable.SelectPayload(p => p));
+        }
+
+        [Fact]
+        public void SelectPayload_FromMessage_T_ArgumentNullException_GetPayloadFunc()
+        {
+            Func<byte[], byte[]> getPayloadFunc = null;
+
+            Assert.Throws<ArgumentNullException>(() => Observable.Never<MqttApplicationMessage>().SelectPayload(getPayloadFunc));
         }
 
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public void GetPayloadT_Exception(bool skipOnError)
+        public void SelectPayload_T_FromEvent_Exception(bool skipOnError)
         {
             var message = new MqttApplicationMessageBuilder()
                 .WithExactlyOnceQoS()
@@ -161,7 +264,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .Build();
             var @event = new MqttApplicationMessageReceivedEventArgs("C", message);
             var ex = new Exception();
-            var observable = Observable.Return(@event).GetPayload<byte[]>(p => throw ex, skipOnError);
+            var observable = Observable.Return(@event).SelectPayload<byte[]>(p => throw ex, skipOnError);
 
             var testScheduler = new TestScheduler();
 
@@ -174,17 +277,35 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         }
 
         [Fact]
-        public void GetPayloadT_SourceException()
+        public void SelectPayload_T_FromEvent_SourceException()
         {
             var observable = Observable
                 .Create<MqttApplicationMessageReceivedEventArgs>(o => { o.OnError(new Exception()); return Disposable.Empty; })
-                .GetPayload(p => p);
+                .SelectPayload(p => p);
 
             var testScheduler = new TestScheduler();
 
             var observableResult = testScheduler.Start(() => observable, 0, 0, 1);
 
             Assert.Single(observableResult.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnError));
+        }
+
+        [Fact]
+        public void ToUTF8String()
+        {
+            var payload = "Test";
+            var array = Encoding.UTF8.GetBytes(payload);
+            var result = array.ToUTF8String("");
+            Assert.Equal(payload, result);
+        }
+
+        [Fact]
+        public void ToUTF8String_Default()
+        {
+            var defaultPayload = "Test";
+            byte[] array = null;
+            var result = array.ToUTF8String(defaultPayload);
+            Assert.Equal(defaultPayload, result);
         }
     }
 }

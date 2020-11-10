@@ -1,5 +1,7 @@
 ﻿using Autofac.Extras.Moq;
 using Microsoft.Reactive.Testing;
+using Moq;
+using MQTTnet.Diagnostics;
 using MQTTnet.Extensions.ManagedClient;
 using System;
 using System.Linq;
@@ -7,12 +9,83 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 {
     public class RxSubscriber
     {
+        [Theory]
+        [InlineData(" ")]
+        [InlineData("")]
+        [InlineData(null)]
+        public void Connect_ArguemntException(string topic)
+        {
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IManagedMqttClient>();
+            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            Assert.Throws<ArgumentException>(() => rxMqttClinet.Connect(topic));
+        }
+
+        [Fact]
+        public void Connect_SubscribeAsync_Exception()
+        {
+            var exceptin = new Exception("Test");
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IManagedMqttClient>().Setup(x => x.SubscribeAsync(It.IsAny<MqttTopicFilter[]>())).Throws(exceptin);
+            mock.Mock<IMqttNetLogger>().Setup(x => x.CreateScopedLogger(It.IsAny<string>())).Returns(mock.Mock<IMqttNetScopedLogger>().Object);
+
+            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var testScheduler = new TestScheduler();
+
+            testScheduler.ScheduleAbsolute("Topic", 2, (_, state) => { rxMqttClinet.Connect(state); return Disposable.Empty; });
+
+            var result = testScheduler.Start(() => rxMqttClinet.Connect("Topic"), 0, 0, 3);
+
+            Assert.Single(result.Messages);
+            Assert.Single(result.Messages.Where(record => record.Value.Kind == NotificationKind.OnError));
+            Assert.Equal(exceptin, result.Messages.Where(record => record.Value.Kind == NotificationKind.OnError).Single().Value.Exception);
+            mock.Mock<IMqttNetScopedLogger>().Verify(x => x.Publish(It.IsAny<MqttNetLogLevel>(), It.IsAny<string>(), It.IsAny<object[]>(), exceptin), Times.Once);
+        }
+
+        [Fact]
+        public void Disconnect_UnsubscribeAsync_ObjectDisposedException_Leads_To_No_Error()
+        {
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IManagedMqttClient>().Setup(x => x.SubscribeAsync(It.IsAny<MqttTopicFilter[]>())).Returns(Task.CompletedTask);
+            mock.Mock<IManagedMqttClient>().Setup(x => x.UnsubscribeAsync(It.IsAny<string[]>())).Throws(new ObjectDisposedException(nameof(IManagedMqttClient)));
+            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var testScheduler = new TestScheduler();
+
+            testScheduler.ScheduleAbsolute("Topic", 2, (_, state) => { rxMqttClinet.Connect(state); return Disposable.Empty; });
+
+            var result = testScheduler.Start(() => rxMqttClinet.Connect("Topic"), 0, 0, 3);
+
+            Assert.Empty(result.Messages);
+            mock.Mock<IMqttNetScopedLogger>().Verify(x => x.Publish(MqttNetLogLevel.Error, It.IsAny<string>(), It.IsAny<object[]>(), It.IsAny<Exception>()), Times.Never);
+        }
+
+        [Fact]
+        public void Disconnect_UnsubscribeAsync_Exception()
+        {
+            var exceptin = new Exception("Test");
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IManagedMqttClient>().Setup(x => x.SubscribeAsync(It.IsAny<MqttTopicFilter[]>())).Returns(Task.CompletedTask);
+            mock.Mock<IManagedMqttClient>().Setup(x => x.UnsubscribeAsync(It.IsAny<string[]>())).Throws(exceptin);
+            mock.Mock<IMqttNetLogger>().Setup(x => x.CreateScopedLogger(It.IsAny<string>())).Returns(mock.Mock<IMqttNetScopedLogger>().Object);
+
+            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var testScheduler = new TestScheduler();
+
+            testScheduler.ScheduleAbsolute("Topic", 2, (_, state) => { rxMqttClinet.Connect(state); return Disposable.Empty; });
+
+            var result = testScheduler.Start(() => rxMqttClinet.Connect("Topic"), 0, 0, 3);
+
+            Assert.Empty(result.Messages);
+            mock.Mock<IMqttNetScopedLogger>().Verify(x => x.Publish(MqttNetLogLevel.Error, It.IsAny<string>(), It.IsAny<object[]>(), exceptin), Times.Once);
+        }
+
         [Fact]
         public void Publisch_2Subscribe_2Recive_1Dispose_1Recive_Dispose()
         {
