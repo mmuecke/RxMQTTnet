@@ -70,7 +70,6 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// </summary>
         IObservable<ManagedProcessFailedEventArgs> SynchronizingSubscriptionsFailedEvent { get; }
 
-
         /// <summary>
         /// Observer for events when message was processed.
         /// </summary>
