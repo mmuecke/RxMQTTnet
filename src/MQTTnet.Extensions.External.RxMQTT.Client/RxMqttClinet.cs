@@ -102,7 +102,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             applicationMessageReceived = CrateFromHandler<MqttApplicationMessageReceivedEventArgs>(observer =>
                 {
                     managedMqttClient.UseApplicationMessageReceivedHandler(args => observer.OnNext(args));
-                    return Disposable.Create(() => managedMqttClient.UseApplicationMessageReceivedHandler((IMqttApplicationMessageReceivedHandler)null));
+                    return Disposable.Create(() => managedMqttClient.ApplicationMessageReceivedHandler = null);
                 });
 
             IObservable<T> CrateFromHandler<T>(Func<IObserver<T>, IDisposable> func)
