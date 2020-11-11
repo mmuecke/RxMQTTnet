@@ -95,7 +95,6 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
 
                             try
                             {
-
                                 _ = rxMqttClinet.PublishAsync(managedMqttApplicationMessage);
                             }
                             catch (Exception exception)

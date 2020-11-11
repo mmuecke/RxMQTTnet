@@ -1,5 +1,4 @@
-﻿using MQTTnet.Client.Publishing;
-using MQTTnet.Extensions.ManagedClient;
+﻿using MQTTnet.Extensions.ManagedClient;
 using System;
 
 namespace MQTTnet.Extensions.External.RxMQTT.Client
