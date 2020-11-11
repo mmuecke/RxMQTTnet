@@ -70,6 +70,17 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// </summary>
         IObservable<ManagedProcessFailedEventArgs> SynchronizingSubscriptionsFailedEvent { get; }
 
+
+        /// <summary>
+        /// Observer for events when message was processed.
+        /// </summary>
+        IObservable<ApplicationMessageProcessedEventArgs> ApplicationMessageProcessedEvent { get; }
+
+        /// <summary>
+        /// Observer for events when message was skipped.
+        /// </summary>
+        IObservable<ApplicationMessageSkippedEventArgs> ApplicationMessageSkippedEvent { get; }
+
         /// <summary>
         /// Connect to a subscription to the <paramref name="topic"/>.
         /// </summary>
