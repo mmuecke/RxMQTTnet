@@ -1,3 +1,3 @@
 ﻿using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("MQTTnet.Extensions.External.RxMQTTnet.Client.Test")]
+[assembly: InternalsVisibleTo("MQTTnet.Extensions.External.RxMQTT.Client.Test")]

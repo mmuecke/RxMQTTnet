@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MQTTnet.Extensions.External.RxMQTT.Client", "MQTTnet.Extensions.External.RxMQTT.Client\MQTTnet.Extensions.External.RxMQTT.Client.csproj", "{F41087A9-6854-4E3D-999B-03C821CC7DFB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MQTTnet.Extensions.External.RxMQTTnet.Client.Test", "MQTTnet.Extensions.External.RxMQTT.Client.Test\MQTTnet.Extensions.External.RxMQTTnet.Client.Test.csproj", "{2598A866-A116-4C14-8839-5C3BF836CFDA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MQTTnet.Extensions.External.RxMQTT.Client.Test", "MQTTnet.Extensions.External.RxMQTT.Client.Test\MQTTnet.Extensions.External.RxMQTT.Client.Test.csproj", "{2598A866-A116-4C14-8839-5C3BF836CFDA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{95950FD2-BC8A-4FE3-8D4A-9448008A0727}"
 	ProjectSection(SolutionItems) = preProject
