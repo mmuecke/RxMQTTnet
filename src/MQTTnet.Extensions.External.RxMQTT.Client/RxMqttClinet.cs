@@ -38,7 +38,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// factory methods to crate the client.
         /// </remarks>
         /// <exception cref="ArgumentNullException"></exception>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA2000:Dispose objects before losing scope", Justification = "Logged or forwarded.")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA2000:Dispose objects before losing scope", Justification = "Is disposed wiht the class.")]
         public RxMqttClinet(IManagedMqttClient managedMqttClient, IMqttNetLogger logger)
         {
             InternalClient = managedMqttClient ?? throw new ArgumentNullException(nameof(managedMqttClient));
@@ -120,8 +120,10 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             });
         }
 
+        /// <inheritdoc/>
         public IObservable<ApplicationMessageProcessedEventArgs> ApplicationMessageProcessedEvent { get; }
 
+        /// <inheritdoc/>
         public IObservable<ApplicationMessageSkippedEventArgs> ApplicationMessageSkippedEvent { get; }
 
         /// <inheritdoc/>
