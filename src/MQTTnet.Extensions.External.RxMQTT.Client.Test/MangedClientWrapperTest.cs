@@ -15,7 +15,6 @@ using Xunit;
 
 namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 {
-
     public class MangedClientWrapperTest
     {
         [Fact]

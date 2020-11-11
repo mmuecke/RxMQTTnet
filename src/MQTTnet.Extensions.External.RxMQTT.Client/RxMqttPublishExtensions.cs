@@ -22,7 +22,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             if (rxMqttClinet is null) throw new ArgumentNullException(nameof(rxMqttClinet));
             if (observable is null) throw new ArgumentNullException(nameof(observable));
 
-            return observable.Publish(rxMqttClinet);
+            return observable.PublishOn(rxMqttClinet);
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             if (rxMqttClinet is null) throw new ArgumentNullException(nameof(rxMqttClinet));
             if (observable is null) throw new ArgumentNullException(nameof(observable));
 
-            return observable.Publish(rxMqttClinet);
+            return observable.PublishOn(rxMqttClinet);
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// <param name="observable">The source observable.</param>
         /// <param name="rxMqttClinet">The client to publish the messages with.</param>
         /// <returns>A observer for the publish results.</returns>
-        public static IObservable<RxMqttClientPublishResult> Publish(this IObservable<MqttApplicationMessage> observable,
+        public static IObservable<RxMqttClientPublishResult> PublishOn(this IObservable<MqttApplicationMessage> observable,
         IRxMqttClinet rxMqttClinet)
         {
             if (observable is null) throw new ArgumentNullException(nameof(observable));
@@ -54,7 +54,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
 
             return observable
                 .Select(message => new ManagedMqttApplicationMessageBuilder().WithApplicationMessage(message).Build())
-                .Publish(rxMqttClinet);
+                .PublishOn(rxMqttClinet);
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// <param name="rxMqttClinet">The client to publish the messages with.</param>
         /// <returns>A observer for the publish results.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Is forwarded to the observer")]
-        public static IObservable<RxMqttClientPublishResult> Publish(this IObservable<ManagedMqttApplicationMessage> observable, IRxMqttClinet rxMqttClinet)
+        public static IObservable<RxMqttClientPublishResult> PublishOn(this IObservable<ManagedMqttApplicationMessage> observable, IRxMqttClinet rxMqttClinet)
         {
             if (observable is null) throw new ArgumentNullException(nameof(observable));
             if (rxMqttClinet is null) throw new ArgumentNullException(nameof(rxMqttClinet));
@@ -91,12 +91,18 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                                     .Where(@event => @event.ApplicationMessage.Id == managedMqttApplicationMessage.Id)
                                     .Select(@event => new RxMqttClientPublishResult { ReasonCode = RxMqttClientPublishReasonCode.HasSkipped, MqttApplicationMessage = @event.ApplicationMessage }))
                                 .Take(1)
-                                .Subscribe(
-                                    result => observer.OnNext(result),
-                                    exception => observer.OnNext(new RxMqttClientPublishResult { ReasonCode = RxMqttClientPublishReasonCode.HasFailed, Exception = exception }),
-                                    () => observer.OnCompleted());
+                                .SubscribeSafe(observer);
 
-                            _ = rxMqttClinet.PublishAsync(managedMqttApplicationMessage);
+                            try
+                            {
+
+                                _ = rxMqttClinet.PublishAsync(managedMqttApplicationMessage);
+                            }
+                            catch (Exception exception)
+                            {
+                                observer.OnNext(new RxMqttClientPublishResult { ReasonCode = RxMqttClientPublishReasonCode.HasFailed, MqttApplicationMessage = managedMqttApplicationMessage, Exception = exception });
+                                observer.OnCompleted();
+                            }
 
                             return subscription;
                         }

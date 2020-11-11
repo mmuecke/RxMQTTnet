@@ -9,14 +9,17 @@
         /// Message published.
         /// </summary>
         HasSucceeded,
+
         /// <summary>
         /// Message not published, because client was not connected.
         /// </summary>
         ClientNotConnected,
+
         /// <summary>
         /// Message not published, because publish has failed.
         /// </summary>
         HasFailed,
+
         /// <summary>
         /// Message not published, because message was skipped due message queue overflow.
         /// </summary>
