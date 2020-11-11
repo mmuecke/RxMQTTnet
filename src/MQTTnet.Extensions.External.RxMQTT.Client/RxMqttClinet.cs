@@ -1,7 +1,6 @@
 ﻿using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Disconnecting;
 using MQTTnet.Client.Publishing;
-using MQTTnet.Client.Receiving;
 using MQTTnet.Diagnostics;
 using MQTTnet.Extensions.ManagedClient;
 using MQTTnet.Server;
@@ -23,6 +22,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
     public class RxMqttClinet : Internal.Disposable, IRxMqttClinet
     {
         private readonly IObservable<MqttApplicationMessageReceivedEventArgs> applicationMessageReceived;
+
         private readonly IDisposable cleanUp;
         private readonly IMqttNetScopedLogger logger;
         private readonly Dictionary<string, IObservable<MqttApplicationMessageReceivedEventArgs>> topicSubscriptionCache;
@@ -74,6 +74,18 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                     return Disposable.Create(() => managedMqttClient.SynchronizingSubscriptionsFailedHandler = null);
                 });
 
+            ApplicationMessageProcessedEvent = CrateFromHandler<ApplicationMessageProcessedEventArgs>(observer =>
+                {
+                    managedMqttClient.ApplicationMessageProcessedHandler = new ApplicationMessageProcessedHandlerDelegate(args => observer.OnNext(args));
+                    return Disposable.Create(() => managedMqttClient.ApplicationMessageReceivedHandler = null);
+                });
+
+            ApplicationMessageSkippedEvent = CrateFromHandler<ApplicationMessageSkippedEventArgs>(observer =>
+                {
+                    managedMqttClient.ApplicationMessageSkippedHandler = new ApplicationMessageSkippedHandlerDelegate(args => observer.OnNext(args));
+                    return Disposable.Create(() => managedMqttClient.ApplicationMessageReceivedHandler = null);
+                });
+
             Connected = Observable
                 .Create<bool>(observer =>
                 {
@@ -108,6 +120,10 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                 managedMqttClient.Dispose();
             });
         }
+
+        public IObservable<ApplicationMessageProcessedEventArgs> ApplicationMessageProcessedEvent { get; }
+
+        public IObservable<ApplicationMessageSkippedEventArgs> ApplicationMessageSkippedEvent { get; }
 
         /// <inheritdoc/>
         public IObservable<bool> Connected { get; }
