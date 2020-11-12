@@ -1,7 +1,6 @@
 ﻿using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Disconnecting;
 using MQTTnet.Client.Publishing;
-using MQTTnet.Client.Receiving;
 using MQTTnet.Diagnostics;
 using MQTTnet.Extensions.ManagedClient;
 using MQTTnet.Server;
@@ -23,6 +22,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
     public class RxMqttClinet : Internal.Disposable, IRxMqttClinet
     {
         private readonly IObservable<MqttApplicationMessageReceivedEventArgs> applicationMessageReceived;
+
         private readonly IDisposable cleanUp;
         private readonly IMqttNetScopedLogger logger;
         private readonly Dictionary<string, IObservable<MqttApplicationMessageReceivedEventArgs>> topicSubscriptionCache;
@@ -38,6 +38,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// factory methods to crate the client.
         /// </remarks>
         /// <exception cref="ArgumentNullException"></exception>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA2000:Dispose objects before losing scope", Justification = "Is disposed wiht the class.")]
         public RxMqttClinet(IManagedMqttClient managedMqttClient, IMqttNetLogger logger)
         {
             InternalClient = managedMqttClient ?? throw new ArgumentNullException(nameof(managedMqttClient));
@@ -46,9 +47,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             this.logger = logger.CreateScopedLogger(nameof(RxMqttClinet));
             topicSubscriptionCache = new Dictionary<string, IObservable<MqttApplicationMessageReceivedEventArgs>>();
 
-#pragma warning disable CA2000 // Dispose objects before losing scope
             var cancelationSubject = new Subject<Unit>();
-#pragma warning restore CA2000 // Dispose objects before losing scope
 
             ConnectedEvent = CrateFromHandler<MqttClientConnectedEventArgs>(observer =>
                 {
@@ -74,6 +73,18 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                     return Disposable.Create(() => managedMqttClient.SynchronizingSubscriptionsFailedHandler = null);
                 });
 
+            ApplicationMessageProcessedEvent = CrateFromHandler<ApplicationMessageProcessedEventArgs>(observer =>
+                {
+                    managedMqttClient.ApplicationMessageProcessedHandler = new ApplicationMessageProcessedHandlerDelegate(args => observer.OnNext(args));
+                    return Disposable.Create(() => managedMqttClient.ApplicationMessageReceivedHandler = null);
+                });
+
+            ApplicationMessageSkippedEvent = CrateFromHandler<ApplicationMessageSkippedEventArgs>(observer =>
+                {
+                    managedMqttClient.ApplicationMessageSkippedHandler = new ApplicationMessageSkippedHandlerDelegate(args => observer.OnNext(args));
+                    return Disposable.Create(() => managedMqttClient.ApplicationMessageReceivedHandler = null);
+                });
+
             Connected = Observable
                 .Create<bool>(observer =>
                 {
@@ -90,7 +101,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             applicationMessageReceived = CrateFromHandler<MqttApplicationMessageReceivedEventArgs>(observer =>
                 {
                     managedMqttClient.UseApplicationMessageReceivedHandler(args => observer.OnNext(args));
-                    return Disposable.Create(() => managedMqttClient.UseApplicationMessageReceivedHandler((IMqttApplicationMessageReceivedHandler)null));
+                    return Disposable.Create(() => managedMqttClient.ApplicationMessageReceivedHandler = null);
                 });
 
             IObservable<T> CrateFromHandler<T>(Func<IObserver<T>, IDisposable> func)
@@ -108,6 +119,12 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                 managedMqttClient.Dispose();
             });
         }
+
+        /// <inheritdoc/>
+        public IObservable<ApplicationMessageProcessedEventArgs> ApplicationMessageProcessedEvent { get; }
+
+        /// <inheritdoc/>
+        public IObservable<ApplicationMessageSkippedEventArgs> ApplicationMessageSkippedEvent { get; }
 
         /// <inheritdoc/>
         public IObservable<bool> Connected { get; }
