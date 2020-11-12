@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30621.155
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RxMqttClinetDemo", "RxMqttClinetDemo\RxMqttClinetDemo.csproj", "{471E159B-441F-47F7-BCF6-A734E244A651}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MQTTnet.Extensions.External.RxMQTT.Client", "..\..\src\MQTTnet.Extensions.External.RxMQTT.Client\MQTTnet.Extensions.External.RxMQTT.Client.csproj", "{3C47C19C-236C-48D1-AB62-97E96DAA112E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{471E159B-441F-47F7-BCF6-A734E244A651}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{471E159B-441F-47F7-BCF6-A734E244A651}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{471E159B-441F-47F7-BCF6-A734E244A651}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{471E159B-441F-47F7-BCF6-A734E244A651}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3C47C19C-236C-48D1-AB62-97E96DAA112E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3C47C19C-236C-48D1-AB62-97E96DAA112E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3C47C19C-236C-48D1-AB62-97E96DAA112E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3C47C19C-236C-48D1-AB62-97E96DAA112E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {64C0DC6E-B28A-481D-B0EF-9A73DABBAA95}
+	EndGlobalSection
+EndGlobal
