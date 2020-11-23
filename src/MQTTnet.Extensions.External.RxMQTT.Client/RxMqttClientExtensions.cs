@@ -8,7 +8,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
     /// <summary>
     /// Extensions for rx mqtt client.
     /// </summary>
-    public static class RxMqttClinetExtensions
+    public static class RxMqttClientExtensions
     {
         /// <summary>
         /// Filter the stream by a <see cref="MqttQualityOfServiceLevel"/>.
@@ -55,8 +55,13 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             if (source is null) throw new ArgumentNullException(nameof(source));
             if (string.IsNullOrWhiteSpace(topic)) throw new ArgumentException($"'{nameof(topic)}' cannot be null or whitespace", nameof(topic));
 
-            var topicFilter = new TopicFilter(topic);
-            return source.Where(@event => topicFilter.IsTopicMatch(@event.ApplicationMessage.Topic));
+            return Observable.Create<MqttApplicationMessageReceivedEventArgs>(observer =>
+            {
+                var topicFilter = new TopicFilter(topic);
+                return source
+                    .Where(@event => topicFilter.IsTopicMatch(@event.ApplicationMessage.Topic))
+                    .SubscribeSafe(observer);
+            });
         }
 
         /// <summary>
@@ -74,8 +79,26 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             if (source is null) throw new ArgumentNullException(nameof(source));
             if (string.IsNullOrWhiteSpace(topic)) throw new ArgumentException($"'{nameof(topic)}' cannot be null or whitespace", nameof(topic));
 
-            var topicFilter = new TopicFilter(topic);
-            return source.Where(message => topicFilter.IsTopicMatch(message.Topic));
+            return Observable.Create<MqttApplicationMessage>(observer =>
+            {
+                var topicFilter = new TopicFilter(topic);
+                return source
+                    .Where(message => topicFilter.IsTopicMatch(message.Topic))
+                    .SubscribeSafe(observer);
+            });
+        }
+
+        /// <summary>
+        /// Select the message from the event arguments.
+        /// </summary>
+        /// <param name="source">The source observable.</param>
+        /// <returns>The selected messages observable.</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static IObservable<MqttApplicationMessage> SelectMessage(this IObservable<MqttApplicationMessageReceivedEventArgs> source)
+        {
+            if (source is null) throw new ArgumentNullException(nameof(source));
+
+            return source.Select(@event => @event.ApplicationMessage);
         }
 
         /// <summary>
@@ -91,19 +114,6 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             if (source is null) throw new ArgumentNullException(nameof(source));
 
             return source.SelectMessage().SelectPayload(skipOnError, defaultOnNull);
-        }
-
-        /// <summary>
-        /// Select the message from the event arguments.
-        /// </summary>
-        /// <param name="source">The source observable.</param>
-        /// <returns>The selected messages observable.</returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static IObservable<MqttApplicationMessage> SelectMessage(this IObservable<MqttApplicationMessageReceivedEventArgs> source)
-        {
-            if (source is null) throw new ArgumentNullException(nameof(source));
-
-            return source.Select(@event => @event.ApplicationMessage);
         }
 
         /// <summary>
@@ -149,7 +159,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             if (source is null) throw new ArgumentNullException(nameof(source));
             if (getPayloadFunc is null) throw new ArgumentNullException(nameof(getPayloadFunc));
 
-            return new MessagePayloadTransform<T>(source, getPayloadFunc, skipOnError).Run();
+            return new MessageTransform<T>(source, getPayloadFunc, skipOnError).Run();
         }
 
         /// <summary>

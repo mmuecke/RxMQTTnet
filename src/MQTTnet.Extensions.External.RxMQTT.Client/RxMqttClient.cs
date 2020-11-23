@@ -19,7 +19,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
     /// <summary>
     /// A mqtt client using <see cref="System.Reactive"/> for subscribing to topics.
     /// </summary>
-    public class RxMqttClinet : Internal.Disposable, IRxMqttClinet
+    public class RxMqttClient : Internal.Disposable, IRxMqttClient
     {
         private readonly IObservable<MqttApplicationMessageReceivedEventArgs> applicationMessageReceived;
 
@@ -39,12 +39,12 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// </remarks>
         /// <exception cref="ArgumentNullException"></exception>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA2000:Dispose objects before losing scope", Justification = "Is disposed wiht the class.")]
-        public RxMqttClinet(IManagedMqttClient managedMqttClient, IMqttNetLogger logger)
+        public RxMqttClient(IManagedMqttClient managedMqttClient, IMqttNetLogger logger)
         {
             InternalClient = managedMqttClient ?? throw new ArgumentNullException(nameof(managedMqttClient));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
 
-            this.logger = logger.CreateScopedLogger(nameof(RxMqttClinet));
+            this.logger = logger.CreateScopedLogger(nameof(RxMqttClient));
             topicSubscriptionCache = new Dictionary<string, IObservable<MqttApplicationMessageReceivedEventArgs>>();
 
             var cancelationSubject = new Subject<Unit>();

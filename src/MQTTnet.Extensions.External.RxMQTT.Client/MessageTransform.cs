@@ -3,19 +3,33 @@ using System.Reactive.Linq;
 
 namespace MQTTnet.Extensions.External.RxMQTT.Client
 {
-    internal class MessagePayloadTransform<T>
+    /// <summary>
+    /// A helper to transform the message to a new type <typeparamref name="T"/>.
+    /// </summary>
+    /// <typeparam name="T">The transformed type.</typeparam>
+    public class MessageTransform<T>
     {
         private readonly IObservable<MqttApplicationMessage> source;
         private readonly Func<byte[], T> getPayloadFunc;
         private readonly bool skipOnError;
 
-        public MessagePayloadTransform(IObservable<MqttApplicationMessage> source, Func<byte[], T> getPayloadFunc, bool skipOnError)
+        /// <summary>
+        /// Crate a helper to transform the message to a new type <typeparamref name="T"/>.
+        /// </summary>
+        /// <param name="source">The source message observable.</param>
+        /// <param name="transformFunc">The transform function.</param>
+        /// <param name="skipOnError">A flag to indicate to skip transform errors.</param>
+        public MessageTransform(IObservable<MqttApplicationMessage> source, Func<byte[], T> transformFunc, bool skipOnError)
         {
             this.source = source ?? throw new ArgumentNullException(nameof(source));
-            this.getPayloadFunc = getPayloadFunc ?? throw new ArgumentNullException(nameof(getPayloadFunc));
+            this.getPayloadFunc = transformFunc ?? throw new ArgumentNullException(nameof(transformFunc));
             this.skipOnError = skipOnError;
         }
 
+        /// <summary>
+        /// Run the transform observer.
+        /// </summary>
+        /// <returns>The transformed observer.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Exception is forwarded to subscriber.")]
         public IObservable<T> Run()
         {

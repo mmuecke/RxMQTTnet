@@ -15,7 +15,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
     /// <see cref="MqttFactoryExtensions.CreateRxMqttClient(IMqttFactory, Diagnostics.IMqttNetLogger)"/>
     /// factory methods to crate the client.
     /// </remarks>
-    public interface IRxMqttClinet : IApplicationMessagePublisher, IDisposable
+    public interface IRxMqttClient : IApplicationMessagePublisher, IDisposable
     {
         /// <summary>
         /// Observer for the connection state of the client.
