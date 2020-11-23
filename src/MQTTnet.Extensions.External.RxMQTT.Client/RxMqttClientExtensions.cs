@@ -159,7 +159,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             if (source is null) throw new ArgumentNullException(nameof(source));
             if (getPayloadFunc is null) throw new ArgumentNullException(nameof(getPayloadFunc));
 
-            return new MessagePayloadTransform<T>(source, getPayloadFunc, skipOnError).Run();
+            return new MessageTransform<T>(source, getPayloadFunc, skipOnError).Run();
         }
 
         /// <summary>
