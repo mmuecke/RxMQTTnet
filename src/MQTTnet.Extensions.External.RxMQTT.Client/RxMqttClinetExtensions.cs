@@ -54,9 +54,14 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         {
             if (source is null) throw new ArgumentNullException(nameof(source));
             if (string.IsNullOrWhiteSpace(topic)) throw new ArgumentException($"'{nameof(topic)}' cannot be null or whitespace", nameof(topic));
-
-            var topicFilter = new TopicFilter(topic);
-            return source.Where(@event => topicFilter.IsTopicMatch(@event.ApplicationMessage.Topic));
+     
+            return Observable.Create<PubSubClientMessage>(observer =>
+             {
+                 var topicFilter = new TopicFilter(topic);
+                 return source
+                     .Where(message =>  topicFilter.IsTopicMatch(@event.ApplicationMessage.Topic))
+                     .SubscribeSafe(observer);
+             });
         }
 
         /// <summary>
@@ -74,8 +79,13 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             if (source is null) throw new ArgumentNullException(nameof(source));
             if (string.IsNullOrWhiteSpace(topic)) throw new ArgumentException($"'{nameof(topic)}' cannot be null or whitespace", nameof(topic));
 
-            var topicFilter = new TopicFilter(topic);
-            return source.Where(message => topicFilter.IsTopicMatch(message.Topic));
+             return Observable.Create<PubSubClientMessage>(observer =>
+             {
+                 var topicFilter = new TopicFilter(topic);
+                 return source
+                     .Where(message => topicFilter.IsTopicMatch(message.Topic))
+                     .SubscribeSafe(observer);
+             });
         }
 
         /// <summary>
