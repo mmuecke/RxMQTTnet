@@ -86,7 +86,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             mock.Mock<IManagedMqttClient>();
             var managedMqttClient = mock.Create<IManagedMqttClient>(); ;
             IMqttNetLogger logger = null;
-            Assert.Throws<ArgumentNullException>(() => new RxMqttClinet(managedMqttClient, logger));
+            Assert.Throws<ArgumentNullException>(() => new RxMqttClient(managedMqttClient, logger));
         }
 
         [Fact]
@@ -97,7 +97,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             IManagedMqttClient managedMqttClient = null;
             var logger = mock.Create<IMqttNetLogger>();
 
-            Assert.Throws<ArgumentNullException>(() => new RxMqttClinet(managedMqttClient, logger));
+            Assert.Throws<ArgumentNullException>(() => new RxMqttClient(managedMqttClient, logger));
         }
 
         [Fact]
