@@ -19,7 +19,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
     /// <summary>
     /// A mqtt client using <see cref="System.Reactive"/> for subscribing to topics.
     /// </summary>
-    public class RxMqttClinet : Internal.Disposable, IRxMqttClinet
+    public class RxMqttClinet : Internal.Disposable, IRxMqttClient
     {
         private readonly IObservable<MqttApplicationMessageReceivedEventArgs> applicationMessageReceived;
 

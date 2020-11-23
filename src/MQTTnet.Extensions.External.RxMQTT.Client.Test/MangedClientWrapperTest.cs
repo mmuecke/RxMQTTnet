@@ -22,7 +22,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         {
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>().SetupProperty(x => x.ConnectedHandler);
-            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var rxMqttClinet = mock.Create<RxMqttClient>();
 
             var testScheduler = new TestScheduler();
 
@@ -44,7 +44,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             using var mock = AutoMock.GetLoose();
 
             mock.Mock<IManagedMqttClient>();
-            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var rxMqttClinet = mock.Create<RxMqttClient>();
 
             var testScheduler = new TestScheduler();
 
@@ -62,7 +62,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>()
                 .SetupProperty(x => x.ConnectingFailedHandler);
-            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var rxMqttClinet = mock.Create<RxMqttClient>();
 
             var testScheduler = new TestScheduler();
 
@@ -106,7 +106,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>().SetupProperty(x => x.ConnectedHandler)
             .SetupProperty(x => x.DisconnectedHandler);
-            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var rxMqttClinet = mock.Create<RxMqttClient>();
 
             var testScheduler = new TestScheduler();
 
@@ -130,7 +130,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 
             // test
             Assert.NotNull(client);
-            Assert.IsType<RxMqttClinet>(client);
+            Assert.IsType<RxMqttClient>(client);
         }
 
         [Fact]
@@ -157,7 +157,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 
             // test
             Assert.NotNull(client);
-            Assert.IsType<RxMqttClinet>(client);
+            Assert.IsType<RxMqttClient>(client);
         }
 
         [Fact]
@@ -183,7 +183,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             mock.Mock<IManagedMqttClient>()
                 .Setup(x => x.Options)
                 .Returns(options);
-            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var rxMqttClinet = mock.Create<RxMqttClient>();
 
             // act
             await rxMqttClinet.StartAsync(options);
@@ -204,7 +204,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .Returns(count);
 
             // act
-            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var rxMqttClinet = mock.Create<RxMqttClient>();
 
             // test
             Assert.Equal(count, rxMqttClinet.PendingApplicationMessagesCount);
@@ -216,7 +216,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             using var mock = AutoMock.GetLoose();
 
             mock.Mock<IManagedMqttClient>();
-            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var rxMqttClinet = mock.Create<RxMqttClient>();
 
             var cts = new CancellationToken();
 
@@ -234,7 +234,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             var message = new ManagedMqttApplicationMessage();
 
             mock.Mock<IManagedMqttClient>();
-            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var rxMqttClinet = mock.Create<RxMqttClient>();
 
             // act
             await rxMqttClinet.PublishAsync(message);
@@ -248,7 +248,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         {
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>();
-            RxMqttClinet rxMqttClinet = mock.Create<RxMqttClinet>();
+            RxMqttClient rxMqttClinet = mock.Create<RxMqttClient>();
 
             // act
             _ = Assert.ThrowsAsync<ArgumentNullException>(() => rxMqttClinet.PublishAsync(null));
@@ -262,7 +262,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             var message = new MqttApplicationMessage();
 
             mock.Mock<IManagedMqttClient>();
-            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var rxMqttClinet = mock.Create<RxMqttClient>();
 
             // act
             await rxMqttClinet.PublishAsync(message, ct);
@@ -277,7 +277,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             using var mock = AutoMock.GetLoose();
             var ct = new CancellationToken();
             mock.Mock<IManagedMqttClient>();
-            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var rxMqttClinet = mock.Create<RxMqttClient>();
 
             // act
             _ = Assert.ThrowsAsync<ArgumentNullException>(() => rxMqttClinet.PublishAsync(null, ct));
@@ -295,7 +295,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .Returns(isStarted);
 
             // act
-            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var rxMqttClinet = mock.Create<RxMqttClient>();
 
             // test
             Assert.Equal(isStarted, rxMqttClinet.IsConnected);
@@ -313,7 +313,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .Returns(isStarted);
 
             // act
-            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var rxMqttClinet = mock.Create<RxMqttClient>();
 
             // test
             Assert.Equal(isStarted, rxMqttClinet.IsStarted);
@@ -332,7 +332,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .Build();
 
             mock.Mock<IManagedMqttClient>();
-            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var rxMqttClinet = mock.Create<RxMqttClient>();
 
             // act
             await rxMqttClinet.StartAsync(options);
@@ -346,7 +346,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         {
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>();
-            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var rxMqttClinet = mock.Create<RxMqttClient>();
 
             // act
             _ = Assert.ThrowsAsync<ArgumentNullException>(() => rxMqttClinet.StartAsync(null));
@@ -358,7 +358,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             using var mock = AutoMock.GetLoose();
 
             mock.Mock<IManagedMqttClient>();
-            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var rxMqttClinet = mock.Create<RxMqttClient>();
 
             // act
             await rxMqttClinet.StopAsync();
@@ -373,7 +373,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>()
                 .SetupProperty(x => x.SynchronizingSubscriptionsFailedHandler);
-            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var rxMqttClinet = mock.Create<RxMqttClient>();
 
             var testScheduler = new TestScheduler();
 
@@ -395,7 +395,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>()
                 .SetupProperty(x => x.ApplicationMessageProcessedHandler);
-            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var rxMqttClinet = mock.Create<RxMqttClient>();
 
             var testScheduler = new TestScheduler();
 
@@ -418,7 +418,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>()
                 .SetupProperty(x => x.ApplicationMessageSkippedHandler);
-            var rxMqttClinet = mock.Create<RxMqttClinet>();
+            var rxMqttClinet = mock.Create<RxMqttClient>();
 
             var testScheduler = new TestScheduler();
 

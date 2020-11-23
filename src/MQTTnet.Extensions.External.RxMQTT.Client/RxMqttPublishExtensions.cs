@@ -16,7 +16,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// <param name="rxMqttClinet">The client to publish the messages with.</param>
         /// <param name="observable">The source observable.</param>
         /// <returns>A observer for the publish results.</returns>
-        public static IObservable<RxMqttClientPublishResult> Publish(this IRxMqttClinet rxMqttClinet,
+        public static IObservable<RxMqttClientPublishResult> Publish(this IRxMqttClient rxMqttClinet,
         IObservable<ManagedMqttApplicationMessage> observable)
         {
             if (rxMqttClinet is null) throw new ArgumentNullException(nameof(rxMqttClinet));
@@ -31,7 +31,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// <param name="rxMqttClinet">The client to publish the messages with.</param>
         /// <param name="observable">The source observable.</param>
         /// <returns>A observer for the publish results.</returns>
-        public static IObservable<RxMqttClientPublishResult> Publish(this IRxMqttClinet rxMqttClinet,
+        public static IObservable<RxMqttClientPublishResult> Publish(this IRxMqttClient rxMqttClinet,
         IObservable<MqttApplicationMessage> observable)
         {
             if (rxMqttClinet is null) throw new ArgumentNullException(nameof(rxMqttClinet));
@@ -47,7 +47,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// <param name="rxMqttClinet">The client to publish the messages with.</param>
         /// <returns>A observer for the publish results.</returns>
         public static IObservable<RxMqttClientPublishResult> PublishOn(this IObservable<MqttApplicationMessage> observable,
-        IRxMqttClinet rxMqttClinet)
+        IRxMqttClient rxMqttClinet)
         {
             if (observable is null) throw new ArgumentNullException(nameof(observable));
             if (rxMqttClinet is null) throw new ArgumentNullException(nameof(rxMqttClinet));
@@ -64,7 +64,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// <param name="rxMqttClinet">The client to publish the messages with.</param>
         /// <returns>A observer for the publish results.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Is forwarded to the observer")]
-        public static IObservable<RxMqttClientPublishResult> PublishOn(this IObservable<ManagedMqttApplicationMessage> observable, IRxMqttClinet rxMqttClinet)
+        public static IObservable<RxMqttClientPublishResult> PublishOn(this IObservable<ManagedMqttApplicationMessage> observable, IRxMqttClient rxMqttClinet)
         {
             if (observable is null) throw new ArgumentNullException(nameof(observable));
             if (rxMqttClinet is null) throw new ArgumentNullException(nameof(rxMqttClinet));
