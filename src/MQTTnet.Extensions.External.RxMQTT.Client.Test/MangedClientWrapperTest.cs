@@ -355,14 +355,14 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             using var mock = AutoMock.GetLoose();
 
             mock.Mock<IManagedMqttClient>()
-                .Setup(x => x.IsStarted)
-                .Returns(isStarted);
+                .Setup(x => x.Dispose())
+                .Throws(new Exception());
 
             // act
             var rxMqttClinet = mock.Create<RxMqttClient>();
 
             // test
-            Assert.Equal(isStarted, rxMqttClinet.IsStarted);
+            rxMqttClinet.Dispose();
         }
 
         [Fact]
