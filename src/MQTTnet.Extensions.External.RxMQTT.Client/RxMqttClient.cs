@@ -115,7 +115,8 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             {
                 cancelationSubject.OnNext(Unit.Default);    // complete all observers
                 cancelationSubject.Dispose();
-                managedMqttClient.Dispose();
+                try { managedMqttClient.Dispose(); }
+                catch { }
             });
         }
 

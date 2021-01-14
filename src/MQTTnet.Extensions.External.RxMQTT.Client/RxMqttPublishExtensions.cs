@@ -71,7 +71,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             return observable
                 .Select(managedMqttApplicationMessage =>
                 {
-                    return Observable.Create<RxMqttClientPublishResult>(observer =>
+                    return Observable.Create<RxMqttClientPublishResult>(async observer =>
                     {
                         if (!rxMqttClinet.IsConnected)
                         {
@@ -94,7 +94,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
 
                             try
                             {
-                                _ = rxMqttClinet.PublishAsync(managedMqttApplicationMessage);
+                                await rxMqttClinet.PublishAsync(managedMqttApplicationMessage).ConfigureAwait(false);
                             }
                             catch (Exception exception)
                             {
