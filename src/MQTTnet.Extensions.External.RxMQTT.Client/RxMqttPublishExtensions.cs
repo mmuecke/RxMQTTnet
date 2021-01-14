@@ -63,7 +63,6 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// <param name="observable">The source observable.</param>
         /// <param name="rxMqttClinet">The client to publish the messages with.</param>
         /// <returns>A observer for the publish results.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Is forwarded to the observer")]
         public static IObservable<RxMqttClientPublishResult> PublishOn(this IObservable<ManagedMqttApplicationMessage> observable, IRxMqttClient rxMqttClinet)
         {
             if (observable is null) throw new ArgumentNullException(nameof(observable));
