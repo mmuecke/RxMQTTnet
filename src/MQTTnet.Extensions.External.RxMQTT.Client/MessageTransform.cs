@@ -22,7 +22,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         public MessageTransform(IObservable<MqttApplicationMessage> source, Func<byte[], T> transformFunc, bool skipOnError)
         {
             this.source = source ?? throw new ArgumentNullException(nameof(source));
-            this.getPayloadFunc = transformFunc ?? throw new ArgumentNullException(nameof(transformFunc));
+            getPayloadFunc = transformFunc ?? throw new ArgumentNullException(nameof(transformFunc));
             this.skipOnError = skipOnError;
         }
 
@@ -30,7 +30,6 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// Run the transform observer.
         /// </summary>
         /// <returns>The transformed observer.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Exception is forwarded to subscriber.")]
         public IObservable<T> Run()
         {
             return Observable.Create<T>(observer =>

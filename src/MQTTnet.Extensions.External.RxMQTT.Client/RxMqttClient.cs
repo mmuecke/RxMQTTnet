@@ -38,8 +38,6 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// factory methods to crate the client.
         /// </remarks>
         /// <exception cref="ArgumentNullException"></exception>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA2000:Dispose objects before losing scope", Justification = "Is disposed wiht the class.")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Exception on dispose.")]
         public RxMqttClient(IManagedMqttClient managedMqttClient, IMqttNetLogger logger)
         {
             InternalClient = managedMqttClient ?? throw new ArgumentNullException(nameof(managedMqttClient));
@@ -160,7 +158,6 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentException"></exception>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "Logged or forwarded.")]
         public IObservable<MqttApplicationMessageReceivedEventArgs> Connect(string topic)
         {
             if (string.IsNullOrWhiteSpace(topic))
