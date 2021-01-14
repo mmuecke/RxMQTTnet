@@ -169,6 +169,22 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         }
 
         [Fact]
+        public void Dispose()
+        {
+            using var mock = AutoMock.GetLoose();
+
+            mock.Mock<IManagedMqttClient>()
+                .Setup(x => x.Dispose())
+                .Throws(new Exception());
+
+            // act
+            var rxMqttClinet = mock.Create<RxMqttClient>();
+
+            // test
+            rxMqttClinet.Dispose();
+        }
+
+        [Fact]
         public void Factory()
         {
             // act
@@ -355,14 +371,14 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             using var mock = AutoMock.GetLoose();
 
             mock.Mock<IManagedMqttClient>()
-                .Setup(x => x.Dispose())
-                .Throws(new Exception());
+                .Setup(x => x.IsStarted)
+                .Returns(isStarted);
 
             // act
             var rxMqttClinet = mock.Create<RxMqttClient>();
 
             // test
-            rxMqttClinet.Dispose();
+            Assert.Equal(isStarted, rxMqttClinet.IsStarted);
         }
 
         [Fact]
