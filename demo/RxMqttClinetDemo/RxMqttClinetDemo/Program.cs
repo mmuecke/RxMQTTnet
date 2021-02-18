@@ -9,9 +9,9 @@ using System.Threading;
 
 namespace RxMqttClinetDemo
 {
-    internal class Program
+    internal static class Program
     {
-        private static void Main(string[] args)
+        private static void Main(string[] _)
         {
             new ConsoleMenu()
                .Add("SubscribeExcample", () => SubscribeExcample())
@@ -41,13 +41,13 @@ namespace RxMqttClinetDemo
             _ = mqttClient.StartAsync(options);
 
             using var sub = Observable.Interval(TimeSpan.FromMilliseconds(1000))
-                   .Select(i => new MqttApplicationMessageBuilder()
+                   .Select(_ => new MqttApplicationMessageBuilder()
                        .WithTopic("MyTopic")
                        .WithPayload("Hello World rx: " + DateTime.Now.ToLongTimeString())
                        .WithExactlyOnceQoS()
                        .WithRetainFlag()
                        .Build())
-                   .Publish(mqttClient)
+                   .PublishOn(mqttClient)
                    .Subscribe(r => Console.WriteLine($"{r.ReasonCode} [{r.MqttApplicationMessage.Id}] :" +
                        $" {r.MqttApplicationMessage.ApplicationMessage.Payload.ToUTF8String()}"));
 
@@ -68,7 +68,7 @@ namespace RxMqttClinetDemo
             using var mqttClient = new MqttFactory().CreateRxMqttClient();
             _ = mqttClient.StartAsync(options);
 
-            var topic = "MyTopic/#";
+            const string topic = "MyTopic/#";
 
             mqttClient.Connect(topic)
                 .Select(message => new { message.ApplicationMessage.Topic, Payload = message.ApplicationMessage.Payload.ToUTF8String() })
