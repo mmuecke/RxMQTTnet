@@ -1,5 +1,6 @@
 ![Build](https://github.com/mmuecke/RxMQTTnet/workflows/Build/badge.svg) [![codecov](https://codecov.io/gh/mmuecke/RxMQTTnet/branch/main/graph/badge.svg?token=8KtPaZ3VZB)](https://codecov.io/gh/mmuecke/RxMQTTnet) 
-[![NuGet Stats](https://img.shields.io/nuget/v/MQTTnet.Extensions.External.RxMQTT.Client.svg)](https://www.nuget.org/packages/MQTTnet.Extensions.External.RxMQTT.Client) ![Downloads](https://img.shields.io/nuget/dt/MQTTnet.Extensions.External.RxMQTT.Client.svg)
+[![NuGet Stats](https://img.shields.io/nuget/v/MQTTnet.Extensions.External.RxMQTT.Client.svg)](https://www.nuget.org/packages/MQTTnet.Extensions.External.RxMQTT.Client)
+[![Downloads](https://img.shields.io/nuget/dt/MQTTnet.Extensions.External.RxMQTT.Client.svg)](https://www.nuget.org/packages/MQTTnet.Extensions.External.RxMQTT.Client)
 
 # RxMQTTnet
 A extension to the [MQTTnet](https://github.com/chkr1011/MQTTnet) project, to transform the subscriptions into observables and to publish form a observalbe stream.
