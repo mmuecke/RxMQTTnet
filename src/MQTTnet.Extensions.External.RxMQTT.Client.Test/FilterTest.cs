@@ -37,13 +37,32 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             Assert.Equal(topic, filter.Topic);
         }
 
-        [Theory]
-        [InlineData("Test/#", "Test/P/Te/T", true)]
+        [Theory]        [InlineData("Test/#", "Test/P/Te/T", true)]
+        [InlineData("Test/#", "Test/P_T/Te/T", true)]
+        [InlineData("Test/#", "Test/P-T/Te/T", true)]
+        [InlineData("Test/#", "Test/P*T/Te/T", true)]
+        [InlineData("Test/#", "Test/P;T/Te/T", true)]
+        [InlineData("Test/#", "Test/P#T/Te/T", false)]
+        [InlineData("Test/#", "Test/P+T/Te/T", false)]
         [InlineData("Test/Pre/#", "Test/Pre/Te/T", true)]
         [InlineData("P/+/Test", "P/T/Test", true)]
+        [InlineData("P/+/Test", "P/T_P/Test", true)]
+        [InlineData("P/+/Test", "P/T-P/Test", true)]
+        [InlineData("P/+/Test", "P/T*P/Test", true)]
+        [InlineData("P/+/Test", "P/T;P/Test", true)]
         [InlineData("P/+/Test", "Pre/T/Test", false)]
         [InlineData("Pre/+/Test", "Pre/T/Test", true)]
+        [InlineData("Pre/+/Test", "Pre/T_P/Test", true)]
+        [InlineData("Pre/+/Test", "Pre/T-P/Test", true)]
+        [InlineData("Pre/+/Test", "Pre/T*P/Test", true)]
+        [InlineData("Pre/+/Test", "Pre/T;P/Test", true)]
+        [InlineData("Pre/+/Test", "Pre/T/Test2", false)]
         [InlineData("Pre/+/Test", "P/T/Test", false)]
+        [InlineData("Pre/+/Test/#", "Pre/T*P/Test/e/a", true)]
+        [InlineData("Pre/+/Test/#", "Pre/T*P/Test/San Francisco/a", false)]
+        [InlineData("Pre/+/Test/+/Test", "Pre/T*P/Test/San Francisco/Test", false)]
+        [InlineData("Pre/+/Test/+/Test", "Pre/T*P/Test/SanFrancisco/Test", true)]
+        [InlineData("Pre/+/Test/+/Test/#", "Pre/T*P/Test/Krüze/Test/A/B/C", true)]
         public void Wildcards(string topicFilter, string topicRecived, bool result)
         {
             var filter = new TopicFilter(topicFilter);
