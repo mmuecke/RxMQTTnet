@@ -45,7 +45,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="!$(IsTestProject)">
-    <PackageReference Include="Roslynator.Analyzers" Version="3.1.0" PrivateAssets="All" />
+    <PackageReference Include="Roslynator.Analyzers" Version="3.2.0" PrivateAssets="All" />
   </ItemGroup>
   
   <PropertyGroup>
