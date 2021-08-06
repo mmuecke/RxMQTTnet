@@ -28,7 +28,7 @@ Get an `IObservable<MqttApplicationMessageReceivedEventArgs>` by connecting to t
 ```csharp
 var subscription = rxMqttClinet
     .Connect("RxClientTest/#")
-    .GetPayload()
+    .SelectPayload()
     .Subscribe(Console.WriteLine);
 ```
 
