@@ -21,7 +21,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();
-            var @event = new MqttApplicationMessageReceivedEventArgs("C", message);
+            var @event = new MqttApplicationMessageReceivedEventArgs("C", message, null, null);
 
             var observable = Observable.Return(@event).FilterQoS(filter);
 
@@ -112,7 +112,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();
-            var @event = new MqttApplicationMessageReceivedEventArgs("C", message);
+            var @event = new MqttApplicationMessageReceivedEventArgs("C", message, null, null);
 
             var observable = Observable.Return(@event).FilterTopic(filter);
 
@@ -147,7 +147,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();
-            var @event = new MqttApplicationMessageReceivedEventArgs("C", message);
+            var @event = new MqttApplicationMessageReceivedEventArgs("C", message, null, null);
 
             var observable = Observable.Return(@event).SelectPayload();
 
@@ -166,7 +166,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();
-            var @event = new MqttApplicationMessageReceivedEventArgs("C", message);
+            var @event = new MqttApplicationMessageReceivedEventArgs("C", message, null, null);
 
             var observable = Observable.Return(@event).SelectPayload(p => p);
 
@@ -185,7 +185,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();
-            var @event = new MqttApplicationMessageReceivedEventArgs("C", message);
+            var @event = new MqttApplicationMessageReceivedEventArgs("C", message, null, null);
 
             var observable = Observable.Return(@event).SelectMessage();
 
@@ -262,7 +262,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();
-            var @event = new MqttApplicationMessageReceivedEventArgs("C", message);
+            var @event = new MqttApplicationMessageReceivedEventArgs("C", message, null, null);
             var ex = new Exception();
             var observable = Observable.Return(@event).SelectPayload<byte[]>(p => throw ex, skipOnError);
 

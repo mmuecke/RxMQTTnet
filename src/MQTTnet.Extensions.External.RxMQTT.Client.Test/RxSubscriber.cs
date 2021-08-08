@@ -101,7 +101,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithPayload("P")
                 .WithExactlyOnceQoS()
                 .Build();
-            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message);
+            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message, null, null);
             var testScheduler = new TestScheduler();
 
             // act
@@ -147,7 +147,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithPayload("P")
                 .WithExactlyOnceQoS()
                 .Build();
-            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message);
+            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message, null, null);
             var testScheduler = new TestScheduler();
 
             // act
@@ -179,7 +179,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithPayload("P")
                 .WithExactlyOnceQoS()
                 .Build();
-            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message);
+            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message, null, null);
             var testScheduler = new TestScheduler();
 
             // act
@@ -207,7 +207,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithPayload("P")
                 .WithExactlyOnceQoS()
                 .Build();
-            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message);
+            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message, null, null);
             var testScheduler = new TestScheduler();
 
             // act
@@ -234,7 +234,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithPayload("P")
                 .WithExactlyOnceQoS()
                 .Build();
-            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message);
+            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message, null, null);
             var testScheduler = new TestScheduler();
 
             // act
