@@ -43,10 +43,6 @@
   <ItemGroup>	
     <PackageReference Include="Nerdbank.GitVersioning" Version="3.4.231" PrivateAssets="all" />	
   </ItemGroup>
-
-  <ItemGroup Condition="!$(IsTestProject)">
-    <PackageReference Include="Roslynator.Analyzers" Version="3.2.0" PrivateAssets="All" />
-  </ItemGroup>
   
   <PropertyGroup>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
