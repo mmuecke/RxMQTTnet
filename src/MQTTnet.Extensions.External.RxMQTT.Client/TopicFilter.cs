@@ -22,10 +22,12 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                 throw new System.ArgumentException($"'{nameof(topic)}' cannot be null or whitespace", nameof(topic));
 
             Topic = topic;
-            var topicRegexStrings = topic                    
-                .Replace("/+/", $"/([^{charsToIgnore}]+)?/")
-                .Replace("/#", $"/([^{charsToIgnore}]+/?)+")
-                .Replace("/", @"\/");
+            var topicRegexStrings = topic == "#"
+                ? ".*"
+                : topic                    
+                    .Replace("/+/", $"/([^{charsToIgnore}]+)?/")
+                    .Replace("/#", $"/([^{charsToIgnore}]+/?)+")
+                    .Replace("/", @"\/");
 
 
             topicRegex = new Regex($"^{topicRegexStrings}$");

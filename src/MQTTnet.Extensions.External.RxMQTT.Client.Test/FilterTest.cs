@@ -37,7 +37,9 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             Assert.Equal(topic, filter.Topic);
         }
 
-        [Theory]        [InlineData("Test/#", "Test/P/Te/T", true)]
+        [Theory]      
+        [InlineData("#", "Test/P/Te/T", true)]
+        [InlineData("Test/#", "Test/P/Te/T", true)]
         [InlineData("Test/#", "Test/P_T/Te/T", true)]
         [InlineData("Test/#", "Test/P-T/Te/T", true)]
         [InlineData("Test/#", "Test/P*T/Te/T", true)]
