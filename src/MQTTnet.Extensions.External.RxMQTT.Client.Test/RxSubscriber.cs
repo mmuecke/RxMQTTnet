@@ -1,7 +1,7 @@
 ﻿using Autofac.Extras.Moq;
 using Microsoft.Reactive.Testing;
 using Moq;
-using MQTTnet.Diagnostics;
+using MQTTnet.Diagnostics.Logger;
 using MQTTnet.Extensions.ManagedClient;
 using System;
 using System.Linq;
@@ -34,7 +34,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             var exceptin = new Exception("Test");
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>().Setup(x => x.SubscribeAsync(It.IsAny<MqttTopicFilter[]>())).Throws(exceptin);
-            mock.Mock<IMqttNetLogger>().Setup(x => x.CreateScopedLogger(It.IsAny<string>())).Returns(mock.Mock<IMqttNetScopedLogger>().Object);
+            mock.Mock<IMqttNetLogger>();
 
             var rxMqttClinet = mock.Create<RxMqttClient>();
             var testScheduler = new TestScheduler();
@@ -46,7 +46,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             Assert.Single(result.Messages);
             Assert.Single(result.Messages.Where(record => record.Value.Kind == NotificationKind.OnError));
             Assert.Equal(exceptin, result.Messages.Where(record => record.Value.Kind == NotificationKind.OnError).Single().Value.Exception);
-            mock.Mock<IMqttNetScopedLogger>().Verify(x => x.Publish(It.IsAny<MqttNetLogLevel>(), It.IsAny<string>(), It.IsAny<object[]>(), exceptin), Times.Once);
+            mock.Mock<IMqttNetLogger>().Verify(x => x.Publish(It.IsAny<MqttNetLogLevel>(), It.IsAny<string>(),It.IsAny<string>(), It.IsAny<object[]>(), exceptin), Times.Once);
         }
 
         [Fact]
@@ -56,7 +56,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>().Setup(x => x.SubscribeAsync(It.IsAny<MqttTopicFilter[]>())).Returns(Task.CompletedTask);
             mock.Mock<IManagedMqttClient>().Setup(x => x.UnsubscribeAsync(It.IsAny<string[]>())).Throws(exceptin);
-            mock.Mock<IMqttNetLogger>().Setup(x => x.CreateScopedLogger(It.IsAny<string>())).Returns(mock.Mock<IMqttNetScopedLogger>().Object);
+            mock.Mock<IMqttNetLogger>();
 
             var rxMqttClinet = mock.Create<RxMqttClient>();
             var testScheduler = new TestScheduler();
@@ -65,8 +65,9 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 
             var result = testScheduler.Start(() => rxMqttClinet.Connect("Topic"), 0, 0, 3);
 
-            Assert.Empty(result.Messages);
-            mock.Mock<IMqttNetScopedLogger>().Verify(x => x.Publish(MqttNetLogLevel.Error, It.IsAny<string>(), It.IsAny<object[]>(), exceptin), Times.Once);
+            Assert.Empty(result.Messages); 
+            mock.Mock<IMqttNetLogger>().Verify(x => x.Publish(It.IsAny<MqttNetLogLevel>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<object[]>(), exceptin), Times.Once);
+
         }
 
         [Fact]
@@ -75,6 +76,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>().Setup(x => x.SubscribeAsync(It.IsAny<MqttTopicFilter[]>())).Returns(Task.CompletedTask);
             mock.Mock<IManagedMqttClient>().Setup(x => x.UnsubscribeAsync(It.IsAny<string[]>())).Throws(new ObjectDisposedException(nameof(IManagedMqttClient)));
+            mock.Mock<IMqttNetLogger>();
             var rxMqttClinet = mock.Create<RxMqttClient>();
             var testScheduler = new TestScheduler();
 
@@ -83,7 +85,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             var result = testScheduler.Start(() => rxMqttClinet.Connect("Topic"), 0, 0, 3);
 
             Assert.Empty(result.Messages);
-            mock.Mock<IMqttNetScopedLogger>().Verify(x => x.Publish(MqttNetLogLevel.Error, It.IsAny<string>(), It.IsAny<object[]>(), It.IsAny<Exception>()), Times.Never);
+            mock.Mock<IMqttNetLogger>().Verify(x => x.Publish(MqttNetLogLevel.Error, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<object[]>(), It.IsAny<Exception>()), Times.Never);
         }
 
         [Fact]

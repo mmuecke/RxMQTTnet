@@ -4,6 +4,7 @@ using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Disconnecting;
 using MQTTnet.Client.Options;
 using MQTTnet.Diagnostics;
+using MQTTnet.Diagnostics.Logger;
 using MQTTnet.Extensions.ManagedClient;
 using System;
 using System.Linq;
@@ -72,7 +73,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 
             var testScheduler = new TestScheduler();
 
-            testScheduler.ScheduleAsync(TimeSpan.FromTicks(3), (_, __) => mock.Mock<IManagedMqttClient>().Object.ConnectedHandler.HandleConnectedAsync(new MqttClientConnectedEventArgs(new MqttClientAuthenticateResult())));
+            testScheduler.ScheduleAsync(TimeSpan.FromTicks(3), (_, __) => mock.Mock<IManagedMqttClient>().Object.ConnectedHandler.HandleConnectedAsync(new MqttClientConnectedEventArgs(new MqttClientConnectResult())));
             // act
             var testObserver = testScheduler.Start(() => rxMqttClinet.Connected, 0, 0, 4);
 
@@ -156,8 +157,8 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 
             var testScheduler = new TestScheduler();
 
-            testScheduler.ScheduleAsync(TimeSpan.FromTicks(2), (_, __) => mock.Mock<IManagedMqttClient>().Object.ConnectedHandler.HandleConnectedAsync(new MqttClientConnectedEventArgs(new MqttClientAuthenticateResult())));
-            testScheduler.ScheduleAsync(TimeSpan.FromTicks(3), (_, __) => mock.Mock<IManagedMqttClient>().Object.DisconnectedHandler.HandleDisconnectedAsync(new MqttClientDisconnectedEventArgs(true, new Exception(), new MqttClientAuthenticateResult(), MqttClientDisconnectReason.KeepAliveTimeout)));
+            testScheduler.ScheduleAsync(TimeSpan.FromTicks(2), (_, __) => mock.Mock<IManagedMqttClient>().Object.ConnectedHandler.HandleConnectedAsync(new MqttClientConnectedEventArgs(new MqttClientConnectResult())));
+            testScheduler.ScheduleAsync(TimeSpan.FromTicks(3), (_, __) => mock.Mock<IManagedMqttClient>().Object.DisconnectedHandler.HandleDisconnectedAsync(new MqttClientDisconnectedEventArgs(true, new Exception(), new MqttClientConnectResult(), MqttClientDisconnectReason.KeepAliveTimeout)));
             // act
             var testObserver = testScheduler.Start(() => rxMqttClinet.Connected, 0, 0, 4);
 
@@ -205,7 +206,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         [Fact]
         public void Factory_NullException_With_Logger()
         {
-            var looger = new MqttNetLogger("MyCustomId");
+            var looger = new MqttNetEventLogger("MyCustomId");
             // act
             Assert.Throws<ArgumentNullException>(() => ((MqttFactory)null).CreateRxMqttClient(looger));
         }
@@ -213,7 +214,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         [Fact]
         public void Factory_With_Logger()
         {
-            var looger = new MqttNetLogger("MyCustomId");
+            var looger = new MqttNetEventLogger("MyCustomId");
             // act
             var client = new MqttFactory().CreateRxMqttClient(looger);
 
