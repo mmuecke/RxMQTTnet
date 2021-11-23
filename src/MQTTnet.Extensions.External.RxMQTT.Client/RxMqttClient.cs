@@ -1,7 +1,7 @@
 ﻿using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Disconnecting;
 using MQTTnet.Client.Publishing;
-using MQTTnet.Diagnostics;
+using MQTTnet.Diagnostics.Logger;
 using MQTTnet.Extensions.ManagedClient;
 using MQTTnet.Server;
 using System;
@@ -24,7 +24,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         private readonly IObservable<MqttApplicationMessageReceivedEventArgs> applicationMessageReceived;
 
         private readonly IDisposable cleanUp;
-        private readonly IMqttNetScopedLogger logger;
+        private readonly MqttNetSourceLogger logger;
         private readonly Dictionary<string, IObservable<MqttApplicationMessageReceivedEventArgs>> topicSubscriptionCache;
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             InternalClient = managedMqttClient ?? throw new ArgumentNullException(nameof(managedMqttClient));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
 
-            this.logger = logger.CreateScopedLogger(nameof(RxMqttClient));
+            this.logger = logger.WithSource(nameof(RxMqttClient));
             topicSubscriptionCache = new Dictionary<string, IObservable<MqttApplicationMessageReceivedEventArgs>>();
 
             var cancelationSubject = new Subject<Unit>();

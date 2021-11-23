@@ -1,5 +1,6 @@
 ﻿using MQTTnet.Client.Connecting;
 using MQTTnet.Client.Disconnecting;
+using MQTTnet.Diagnostics.Logger;
 using MQTTnet.Extensions.ManagedClient;
 using System;
 using System.Threading;
@@ -12,7 +13,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
     /// </summary>
     /// <remarks>
     /// Use the <see cref="MqttFactoryExtensions.CreateRxMqttClient(IMqttFactory)"/> or
-    /// <see cref="MqttFactoryExtensions.CreateRxMqttClient(IMqttFactory, Diagnostics.IMqttNetLogger)"/>
+    /// <see cref="MqttFactoryExtensions.CreateRxMqttClient(IMqttFactory, IMqttNetLogger)"/>
     /// factory methods to crate the client.
     /// </remarks>
     public interface IRxMqttClient : IApplicationMessagePublisher, IDisposable
