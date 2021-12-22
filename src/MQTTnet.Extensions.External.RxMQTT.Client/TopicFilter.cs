@@ -24,11 +24,10 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             Topic = topic;
             var topicRegexStrings = topic == "#"
                 ? ".*"
-                : topic                    
+                : topic
                     .Replace("/+/", $"/([^{charsToIgnore}]+)?/")
                     .Replace("/#", $"/([^{charsToIgnore}]+/?)+")
                     .Replace("/", @"\/");
-
 
             topicRegex = new Regex($"^{topicRegexStrings}$");
         }
