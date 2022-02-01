@@ -34,7 +34,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             var exceptin = new Exception("Test");
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>().Setup(x => x.SubscribeAsync(It.IsAny<MqttTopicFilter[]>())).Throws(exceptin);
-            mock.Mock<IMqttNetLogger>();
+            mock.Mock<IMqttNetLogger>().Setup(x => x.IsEnabled).Returns(true);
 
             var rxMqttClinet = mock.Create<RxMqttClient>();
             var testScheduler = new TestScheduler();
@@ -56,7 +56,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>().Setup(x => x.SubscribeAsync(It.IsAny<MqttTopicFilter[]>())).Returns(Task.CompletedTask);
             mock.Mock<IManagedMqttClient>().Setup(x => x.UnsubscribeAsync(It.IsAny<string[]>())).Throws(exceptin);
-            mock.Mock<IMqttNetLogger>();
+            mock.Mock<IMqttNetLogger>().Setup(x => x.IsEnabled).Returns(true);
 
             var rxMqttClinet = mock.Create<RxMqttClient>();
             var testScheduler = new TestScheduler();
