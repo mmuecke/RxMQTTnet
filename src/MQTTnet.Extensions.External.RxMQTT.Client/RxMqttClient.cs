@@ -1,7 +1,5 @@
-﻿using MQTTnet.Client.Connecting;
-using MQTTnet.Client.Disconnecting;
-using MQTTnet.Client.Publishing;
-using MQTTnet.Diagnostics.Logger;
+﻿using MQTTnet.Client;
+using MQTTnet.Diagnostics;
 using MQTTnet.Extensions.ManagedClient;
 using MQTTnet.Server;
 using System;
@@ -28,17 +26,17 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         private readonly Dictionary<string, IObservable<MqttApplicationMessageReceivedEventArgs>> topicSubscriptionCache;
 
         /// <summary>
-        /// Create a rx mqtt client based on a <see cref="IManagedMqttClient"/>.
+        /// Create a rx mqtt client based on a <see cref="ManagedMqttClient"/>.
         /// </summary>
         /// <param name="managedMqttClient">The manged mqtt client.</param>
         /// <param name="logger">The mqtt net logger.</param>
         /// <remarks>
-        /// Use the <see cref="MqttFactoryExtensions.CreateRxMqttClient(IMqttFactory)"/> or
-        /// <see cref="MqttFactoryExtensions.CreateRxMqttClient(IMqttFactory, IMqttNetLogger)"/>
+        /// Use the <see cref="MqttFactoryExtensions.CreateRxMqttClient(MqttFactory)"/> or
+        /// <see cref="MqttFactoryExtensions.CreateRxMqttClient(MqttFactory, IMqttNetLogger)"/>
         /// factory methods to crate the client.
         /// </remarks>
         /// <exception cref="ArgumentNullException"></exception>
-        public RxMqttClient(IManagedMqttClient managedMqttClient, IMqttNetLogger logger)
+        public RxMqttClient(ManagedMqttClient managedMqttClient, IMqttNetLogger logger)
         {
             InternalClient = managedMqttClient ?? throw new ArgumentNullException(nameof(managedMqttClient));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
@@ -48,23 +46,17 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
 
             var cancelationSubject = new Subject<Unit>();
 
-            ConnectedEvent = CrateFromHandler<MqttClientConnectedEventArgs>(observer =>
-                {
-                    managedMqttClient.UseConnectedHandler(args => observer.OnNext(args));
-                    return Disposable.Create(() => managedMqttClient.ConnectedHandler = null);
-                });
+            ConnectedEvent = FromAsyncEvent<EventArgs>(
+                h => managedMqttClient.ConnectedAsync += h,
+                h => managedMqttClient.ConnectedAsync -= h);
 
-            DisconnectedEvent = CrateFromHandler<MqttClientDisconnectedEventArgs>(observer =>
-                {
-                    managedMqttClient.UseDisconnectedHandler(args => observer.OnNext(args));
-                    return Disposable.Create(() => managedMqttClient.DisconnectedHandler = null);
-                });
+            DisconnectedEvent = FromAsyncEvent<EventArgs>(
+                h => managedMqttClient.DisconnectedAsync += h,
+                h => managedMqttClient.DisconnectedAsync -= h);
 
-            ConnectingFailedEvent = CrateFromHandler<ManagedProcessFailedEventArgs>(observer =>
-                {
-                    managedMqttClient.ConnectingFailedHandler = new ConnectingFailedHandlerDelegate(args => observer.OnNext(args));
-                    return Disposable.Create(() => managedMqttClient.ConnectingFailedHandler = null);
-                });
+            ConnectingFailedEvent = FromAsyncEvent<ConnectingFailedEventArgs>(
+                h => managedMqttClient.ConnectingFailedAsync += h,
+                h => managedMqttClient.ConnectingFailedAsync -= h);
 
             SynchronizingSubscriptionsFailedEvent = CrateFromHandler<ManagedProcessFailedEventArgs>(observer =>
                 {
@@ -72,17 +64,15 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                     return Disposable.Create(() => managedMqttClient.SynchronizingSubscriptionsFailedHandler = null);
                 });
 
-            ApplicationMessageProcessedEvent = CrateFromHandler<ApplicationMessageProcessedEventArgs>(observer =>
-                {
-                    managedMqttClient.ApplicationMessageProcessedHandler = new ApplicationMessageProcessedHandlerDelegate(args => observer.OnNext(args));
-                    return Disposable.Create(() => managedMqttClient.ApplicationMessageReceivedHandler = null);
-                });
+            ApplicationMessageProcessedEvent = FromAsyncEvent<ApplicationMessageProcessedEventArgs>(
+                h => managedMqttClient.ApplicationMessageProcessedAsync += h,
+                h => managedMqttClient.ApplicationMessageProcessedAsync -= h);
 
             ApplicationMessageSkippedEvent = CrateFromHandler<ApplicationMessageSkippedEventArgs>(observer =>
-                {
-                    managedMqttClient.ApplicationMessageSkippedHandler = new ApplicationMessageSkippedHandlerDelegate(args => observer.OnNext(args));
-                    return Disposable.Create(() => managedMqttClient.ApplicationMessageReceivedHandler = null);
-                });
+            {
+                managedMqttClient.ApplicationMessageSkippedHandler = new ApplicationMessageSkippedHandlerDelegate(args => observer.OnNext(args));
+                return Disposable.Create(() => managedMqttClient.ApplicationMessageSkippedHandler = null);
+            });
 
             Connected = Observable
                 .Create<bool>(observer =>
@@ -97,12 +87,29 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                 .Replay(1)                          // replay last state on subscribe
                 .RefCount();                        // count subscriptions and dispose source observable when no subscription
 
-            applicationMessageReceived = CrateFromHandler<MqttApplicationMessageReceivedEventArgs>(observer =>
-                {
-                    managedMqttClient.UseApplicationMessageReceivedHandler(args => observer.OnNext(args));
-                    return Disposable.Create(() => managedMqttClient.ApplicationMessageReceivedHandler = null);
-                });
+            applicationMessageReceived = FromAsyncEvent<MqttApplicationMessageReceivedEventArgs>(
+                h => managedMqttClient.ApplicationMessageReceivedAsync += h,
+                h => managedMqttClient.ApplicationMessageReceivedAsync -= h);
 
+
+            IObservable<T> FromAsyncEvent<T>(Action<Func<T, Task>> addHandler, Action<Func<T, Task>> removeHandler)
+            {
+                return Observable
+                    .Create<T>(observer =>
+                    {
+                        Task Delegate(T args)
+                        {
+                            observer.OnNext(args);
+                            return Task.CompletedTask;
+                        }
+                        addHandler(Delegate);
+                        return Disposable.Create(() => removeHandler(Delegate));
+                    })
+                    .TakeUntil(cancelationSubject)  // complete on dispose
+                    .Publish()                      // publish from on source observable
+                    .RefCount();                    // count subscriptions and dispose source observable when no subscription
+                ;
+            }
             IObservable<T> CrateFromHandler<T>(Func<IObserver<T>, IDisposable> func)
             {
                 return Observable.Create(func)
@@ -130,16 +137,16 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         public IObservable<bool> Connected { get; }
 
         /// <inheritdoc/>
-        public IObservable<MqttClientConnectedEventArgs> ConnectedEvent { get; }
+        public IObservable<EventArgs> ConnectedEvent { get; }
 
         /// <inheritdoc/>
-        public IObservable<ManagedProcessFailedEventArgs> ConnectingFailedEvent { get; }
+        public IObservable<ConnectingFailedEventArgs> ConnectingFailedEvent { get; }
 
         /// <inheritdoc/>
-        public IObservable<MqttClientDisconnectedEventArgs> DisconnectedEvent { get; }
+        public IObservable<EventArgs> DisconnectedEvent { get; }
 
         /// <inheritdoc/>
-        public IManagedMqttClient InternalClient { get; }
+        public ManagedMqttClient InternalClient { get; }
 
         /// <inheritdoc/>
         public bool IsConnected => InternalClient.IsConnected;
@@ -148,7 +155,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         public bool IsStarted => InternalClient.IsStarted;
 
         /// <inheritdoc/>
-        public IManagedMqttClientOptions Options => InternalClient.Options;
+        public ManagedMqttClientOptions Options => InternalClient.Options;
 
         /// <inheritdoc/>
         public int PendingApplicationMessagesCount => InternalClient.PendingApplicationMessagesCount;
@@ -229,25 +236,25 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentNullException"></exception>
-        public Task<MqttClientPublishResult> PublishAsync(MqttApplicationMessage applicationMessage, CancellationToken cancellationToken)
-        {
-            if (applicationMessage is null) throw new ArgumentNullException(nameof(applicationMessage));
-
-            return InternalClient.PublishAsync(applicationMessage, cancellationToken);
-        }
-
-        /// <inheritdoc/>
-        /// <exception cref="ArgumentNullException"></exception>
         public Task PublishAsync(ManagedMqttApplicationMessage applicationMessage)
         {
             if (applicationMessage is null) throw new ArgumentNullException(nameof(applicationMessage));
 
-            return InternalClient.PublishAsync(applicationMessage);
+            return InternalClient.EnqueueAsync(applicationMessage);
         }
 
         /// <inheritdoc/>
         /// <exception cref="ArgumentNullException"></exception>
-        public Task StartAsync(IManagedMqttClientOptions options)
+        public Task PublishAsync(MqttApplicationMessage applicationMessage)
+        {
+            if (applicationMessage is null) throw new ArgumentNullException(nameof(applicationMessage));
+
+            return InternalClient.EnqueueAsync(applicationMessage);
+        }
+
+        /// <inheritdoc/>
+        /// <exception cref="ArgumentNullException"></exception>
+        public Task StartAsync(ManagedMqttClientOptions options)
         {
             if (options is null) throw new ArgumentNullException(nameof(options));
 

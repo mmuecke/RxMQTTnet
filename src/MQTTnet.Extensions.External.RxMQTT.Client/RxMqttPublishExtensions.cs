@@ -83,7 +83,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                         {
                             var subscription = rxMqttClinet.ApplicationMessageProcessedEvent
                                 .Where(@event => @event.ApplicationMessage.Id == managedMqttApplicationMessage.Id)
-                                .Select(@event => @event.HasSucceeded
+                                .Select(@event => @event.Exception is null
                                     ? new RxMqttClientPublishResult { ReasonCode = RxMqttClientPublishReasonCode.HasSucceeded, MqttApplicationMessage = @event.ApplicationMessage }
                                     : new RxMqttClientPublishResult { ReasonCode = RxMqttClientPublishReasonCode.HasFailed, MqttApplicationMessage = @event.ApplicationMessage, Exception = @event.Exception })
                                 .Merge(rxMqttClinet.ApplicationMessageSkippedEvent

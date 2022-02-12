@@ -1,4 +1,4 @@
-﻿using MQTTnet.Diagnostics.Logger;
+﻿using MQTTnet.Diagnostics;
 using MQTTnet.Extensions.ManagedClient;
 using System;
 
@@ -14,7 +14,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// </summary>
         /// <param name="factory">The factory to use.</param>
         /// <returns>The <see cref="IRxMqttClient"/>.</returns>
-        public static IRxMqttClient CreateRxMqttClient(this IMqttFactory factory)
+        public static IRxMqttClient CreateRxMqttClient(this MqttFactory factory)
         {
             if (factory == null) throw new ArgumentNullException(nameof(factory));
 
@@ -27,7 +27,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// <param name="factory">The factory to use.</param>
         /// <param name="logger">The mqtt net logger to use.</param>
         /// <returns>The <see cref="IRxMqttClient"/>.</returns>
-        public static IRxMqttClient CreateRxMqttClient(this IMqttFactory factory, IMqttNetLogger logger)
+        public static IRxMqttClient CreateRxMqttClient(this MqttFactory factory, IMqttNetLogger logger)
         {
             if (factory == null) throw new ArgumentNullException(nameof(factory));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
