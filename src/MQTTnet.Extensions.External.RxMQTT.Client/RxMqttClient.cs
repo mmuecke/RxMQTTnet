@@ -81,7 +81,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             ApplicationMessageSkippedEvent = CrateFromHandler<ApplicationMessageSkippedEventArgs>(observer =>
                 {
                     managedMqttClient.ApplicationMessageSkippedHandler = new ApplicationMessageSkippedHandlerDelegate(args => observer.OnNext(args));
-                    return Disposable.Create(() => managedMqttClient.ApplicationMessageReceivedHandler = null);
+                    return Disposable.Create(() => managedMqttClient.ApplicationMessageSkippedHandler = null);
                 });
 
             Connected = Observable
