@@ -36,7 +36,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// factory methods to crate the client.
         /// </remarks>
         /// <exception cref="ArgumentNullException"></exception>
-        public RxMqttClient(ManagedMqttClient managedMqttClient, IMqttNetLogger logger)
+        public RxMqttClient(IManagedMqttClient managedMqttClient, IMqttNetLogger logger)
         {
             InternalClient = managedMqttClient ?? throw new ArgumentNullException(nameof(managedMqttClient));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
@@ -146,7 +146,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         public IObservable<EventArgs> DisconnectedEvent { get; }
 
         /// <inheritdoc/>
-        public ManagedMqttClient InternalClient { get; }
+        public IManagedMqttClient InternalClient { get; }
 
         /// <inheritdoc/>
         public bool IsConnected => InternalClient.IsConnected;

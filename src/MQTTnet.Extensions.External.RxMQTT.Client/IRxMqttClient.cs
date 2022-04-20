@@ -43,7 +43,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// <remarks>
         /// This property should be used with caution because manipulating the internal client might break the rx client.
         /// </remarks>
-        ManagedMqttClient InternalClient { get; }
+        IManagedMqttClient InternalClient { get; }
 
         /// <summary>
         /// The connection state of the client.
