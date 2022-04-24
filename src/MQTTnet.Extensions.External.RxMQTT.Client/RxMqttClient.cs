@@ -58,21 +58,17 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                 h => managedMqttClient.ConnectingFailedAsync += h,
                 h => managedMqttClient.ConnectingFailedAsync -= h);
 
-            SynchronizingSubscriptionsFailedEvent = CrateFromHandler<ManagedProcessFailedEventArgs>(observer =>
-                {
-                    managedMqttClient.SynchronizingSubscriptionsFailedHandler = new SynchronizingSubscriptionsFailedHandlerDelegate(args => observer.OnNext(args));
-                    return Disposable.Create(() => managedMqttClient.SynchronizingSubscriptionsFailedHandler = null);
-                });
+            SynchronizingSubscriptionsFailedEvent = FromAsyncEvent<ManagedProcessFailedEventArgs>(
+                h => managedMqttClient.SynchronizingSubscriptionsFailedAsync += h,
+                h => managedMqttClient.SynchronizingSubscriptionsFailedAsync -= h);
 
             ApplicationMessageProcessedEvent = FromAsyncEvent<ApplicationMessageProcessedEventArgs>(
                 h => managedMqttClient.ApplicationMessageProcessedAsync += h,
                 h => managedMqttClient.ApplicationMessageProcessedAsync -= h);
 
-            ApplicationMessageSkippedEvent = CrateFromHandler<ApplicationMessageSkippedEventArgs>(observer =>
-            {
-                managedMqttClient.ApplicationMessageSkippedHandler = new ApplicationMessageSkippedHandlerDelegate(args => observer.OnNext(args));
-                return Disposable.Create(() => managedMqttClient.ApplicationMessageSkippedHandler = null);
-            });
+            ApplicationMessageSkippedEvent = FromAsyncEvent<ApplicationMessageSkippedEventArgs>(
+                h => managedMqttClient.ApplicationMessageSkippedAsync += h,
+                h => managedMqttClient.ApplicationMessageSkippedAsync -= h);
 
             Connected = Observable
                 .Create<bool>(observer =>
@@ -104,15 +100,6 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                         addHandler(Delegate);
                         return Disposable.Create(() => removeHandler(Delegate));
                     })
-                    .TakeUntil(cancelationSubject)  // complete on dispose
-                    .Publish()                      // publish from on source observable
-                    .RefCount();                    // count subscriptions and dispose source observable when no subscription
-                ;
-            }
-
-            IObservable<T> CrateFromHandler<T>(Func<IObserver<T>, IDisposable> func)
-            {
-                return Observable.Create(func)
                     .TakeUntil(cancelationSubject)  // complete on dispose
                     .Publish()                      // publish from on source observable
                     .RefCount();                    // count subscriptions and dispose source observable when no subscription

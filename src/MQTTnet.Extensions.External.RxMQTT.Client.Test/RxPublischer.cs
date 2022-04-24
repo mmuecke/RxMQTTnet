@@ -22,8 +22,6 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             mock.Mock<IManagedMqttClient>()
                 .Setup(x => x.EnqueueAsync(It.IsAny<ManagedMqttApplicationMessage>())).Returns(Task.CompletedTask);
             mock.Mock<IManagedMqttClient>()
-                .SetupProperty(x => x.ApplicationMessageSkippedHandler);
-            mock.Mock<IManagedMqttClient>()
                 .SetupGet(x => x.IsConnected)
                 .Returns(true);
 
@@ -64,8 +62,6 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             mock.Mock<IManagedMqttClient>()
                 .Setup(x => x.EnqueueAsync(It.IsAny<ManagedMqttApplicationMessage>())).Returns(Task.CompletedTask);
             mock.Mock<IManagedMqttClient>()
-                .SetupProperty(x => x.ApplicationMessageSkippedHandler);
-            mock.Mock<IManagedMqttClient>()
                 .SetupGet(x => x.IsConnected)
                 .Returns(true);
 
@@ -83,8 +79,8 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 
             var testScheduler = new TestScheduler();
             testScheduler.Schedule(TimeSpan.FromTicks(5), () =>
-                mock.Mock<IManagedMqttClient>().Object.ApplicationMessageSkippedHandler.HandleApplicationMessageSkippedAsync(@event));
-
+                 mock.Mock<IManagedMqttClient>().Raise(x => x.ApplicationMessageSkippedAsync -= null, (object)@event));
+            
             // act
             var testObserver = testScheduler.Start(() => observable.PublishOn(rxMqttClinet), 0, 1, 10);
 
@@ -104,8 +100,6 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 
             mock.Mock<IManagedMqttClient>()
                 .Setup(x => x.EnqueueAsync(It.IsAny<ManagedMqttApplicationMessage>())).Returns(Task.CompletedTask);
-            mock.Mock<IManagedMqttClient>()
-                .SetupProperty(x => x.ApplicationMessageSkippedHandler);
             mock.Mock<IManagedMqttClient>()
                 .SetupGet(x => x.IsConnected)
                 .Returns(true);
@@ -145,8 +139,6 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             var exception = new Exception();
             mock.Mock<IManagedMqttClient>()
                 .Setup(x => x.EnqueueAsync(It.IsAny<ManagedMqttApplicationMessage>())).Throws(exception);
-            mock.Mock<IManagedMqttClient>()
-                .SetupProperty(x => x.ApplicationMessageSkippedHandler);
             mock.Mock<IManagedMqttClient>()
                 .SetupGet(x => x.IsConnected)
                 .Returns(true);
@@ -284,8 +276,6 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 
             mock.Mock<IManagedMqttClient>()
                 .Setup(x => x.EnqueueAsync(It.IsAny<ManagedMqttApplicationMessage>())).Returns(Task.CompletedTask);
-            mock.Mock<IManagedMqttClient>()
-                .SetupProperty(x => x.ApplicationMessageSkippedHandler);
 
             var rxMqttClinet = mock.Create<RxMqttClient>();
 
