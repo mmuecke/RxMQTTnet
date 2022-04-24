@@ -1,7 +1,6 @@
 ﻿using MQTTnet.Client;
 using MQTTnet.Diagnostics;
 using MQTTnet.Extensions.ManagedClient;
-using MQTTnet.Server;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +23,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         private readonly IDisposable cleanUp;
         private readonly MqttNetSourceLogger logger;
         private readonly Dictionary<string, IObservable<MqttApplicationMessageReceivedEventArgs>> topicSubscriptionCache;
+        private readonly object topicSubscriptionLock = new object();
 
         /// <summary>
         /// Create a rx mqtt client based on a <see cref="ManagedMqttClient"/>.
@@ -91,7 +91,6 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                 h => managedMqttClient.ApplicationMessageReceivedAsync += h,
                 h => managedMqttClient.ApplicationMessageReceivedAsync -= h);
 
-
             IObservable<T> FromAsyncEvent<T>(Action<Func<T, Task>> addHandler, Action<Func<T, Task>> removeHandler)
             {
                 return Observable
@@ -110,6 +109,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                     .RefCount();                    // count subscriptions and dispose source observable when no subscription
                 ;
             }
+
             IObservable<T> CrateFromHandler<T>(Func<IObserver<T>, IDisposable> func)
             {
                 return Observable.Create(func)
@@ -171,7 +171,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                 throw new ArgumentException($"'{nameof(topic)}' cannot be null or whitespace", nameof(topic));
 
             ThrowIfDisposed();
-            lock (topicSubscriptionCache)
+            lock (topicSubscriptionLock)
             {
                 // try get exiting observable for topic
                 if (!topicSubscriptionCache.TryGetValue(topic, out IObservable<MqttApplicationMessageReceivedEventArgs> observable))
@@ -183,7 +183,10 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                             // subscribe to topic
                             try
                             {
-                                await InternalClient.SubscribeAsync(topic).ConfigureAwait(false);
+                                var mqttTopicFilter = new MqttTopicFilterBuilder()
+                                    .WithTopic(topic)
+                                    .Build();
+                                await InternalClient.SubscribeAsync(new[] { mqttTopicFilter }).ConfigureAwait(false);
                             }
                             catch (Exception exception)
                             {
@@ -201,14 +204,14 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                             return Disposable.Create(async () =>
                                 {
                                     // clean up subscription when no observer subscribed
-                                    lock (topicSubscriptionCache)
+                                    lock (topicSubscriptionLock)
                                     {
                                         messageSubscription.Dispose();
                                         topicSubscriptionCache.Remove(topic);
                                     }
                                     try
                                     {
-                                        await InternalClient.UnsubscribeAsync(topic).ConfigureAwait(false);
+                                        await InternalClient.UnsubscribeAsync(new[] { topic }).ConfigureAwait(false);
                                     }
                                     catch (ObjectDisposedException) { } // if disposed there is nothing to unsubscribe
                                     catch (Exception exception)
@@ -220,9 +223,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                         .Publish()      // publish from on source observable
                         .RefCount();    // count subscriptions and dispose source observable when no subscription
 
-                    // save observable for topic
-                    lock (topicSubscriptionCache)
-                        topicSubscriptionCache.Add(topic, observable);
+                    topicSubscriptionCache.Add(topic, observable);
                 }
                 return observable;
             }

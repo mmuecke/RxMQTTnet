@@ -308,6 +308,8 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             // act
             _ = Assert.ThrowsAsync<ArgumentNullException>(() =>
                 rxMqttClinet.PublishAsync((ManagedMqttApplicationMessage)null));
+            _ = Assert.ThrowsAsync<ArgumentNullException>(() =>
+                rxMqttClinet.PublishAsync((MqttApplicationMessage)null));
         }
 
         [Fact]
