@@ -1,4 +1,5 @@
 ﻿using Microsoft.Reactive.Testing;
+using MQTTnet.Client;
 using MQTTnet.Protocol;
 using System;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         public void FilterQoS_ApplicationEvent(MqttQualityOfServiceLevel filter, bool success)
         {
             var message = new MqttApplicationMessageBuilder()
-                .WithExactlyOnceQoS()
+                .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();
@@ -45,7 +46,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         public void FilterQoS_ApplicationMessage(MqttQualityOfServiceLevel filter, bool success)
         {
             var message = new MqttApplicationMessageBuilder()
-                .WithExactlyOnceQoS()
+                .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();
@@ -72,7 +73,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         public void FilterTopic_ApplicationEvent(string filter, bool success)
         {
             var message = new MqttApplicationMessageBuilder()
-                .WithExactlyOnceQoS()
+                .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();
@@ -108,7 +109,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         public void FilterTopic_ApplicationMessage(string filter, bool success)
         {
             var message = new MqttApplicationMessageBuilder()
-                .WithExactlyOnceQoS()
+                .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();
@@ -143,7 +144,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         public void GetPayload()
         {
             var message = new MqttApplicationMessageBuilder()
-                .WithExactlyOnceQoS()
+                .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();
@@ -162,7 +163,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         public void GetPayload_T_FromEvent()
         {
             var message = new MqttApplicationMessageBuilder()
-                .WithExactlyOnceQoS()
+                .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();
@@ -181,7 +182,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         public void SelectMessage()
         {
             var message = new MqttApplicationMessageBuilder()
-                .WithExactlyOnceQoS()
+                .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();
@@ -258,7 +259,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         public void SelectPayload_T_FromEvent_Exception(bool skipOnError)
         {
             var message = new MqttApplicationMessageBuilder()
-                .WithExactlyOnceQoS()
+                .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();

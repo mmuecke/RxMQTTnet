@@ -2,6 +2,7 @@
 using Microsoft.Reactive.Testing;
 using Moq;
 using MQTTnet.Extensions.ManagedClient;
+using System.Reactive.Concurrency;
 using System;
 using System.Linq;
 using System.Reactive.Disposables;
@@ -19,11 +20,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             using var mock = AutoMock.GetLoose();
 
             mock.Mock<IManagedMqttClient>()
-                .Setup(x => x.PublishAsync(It.IsAny<ManagedMqttApplicationMessage>())).Returns(Task.CompletedTask);
-            mock.Mock<IManagedMqttClient>()
-                .SetupProperty(x => x.ApplicationMessageProcessedHandler);
-            mock.Mock<IManagedMqttClient>()
-                .SetupProperty(x => x.ApplicationMessageSkippedHandler);
+                .Setup(x => x.EnqueueAsync(It.IsAny<ManagedMqttApplicationMessage>())).Returns(Task.CompletedTask);
             mock.Mock<IManagedMqttClient>()
                 .SetupGet(x => x.IsConnected)
                 .Returns(true);
@@ -34,7 +31,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithApplicationMessage(new MqttApplicationMessageBuilder()
                     .WithTopic("T")
                     .WithPayload("P")
-                    .WithExactlyOnceQoS()
+                    .WithQualityOfServiceLevel(Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
                     .Build())
                 .Build();
             var observable = Observable.Return(message);
@@ -42,12 +39,9 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             var @event = new ApplicationMessageProcessedEventArgs(message, exception);
 
             var testScheduler = new TestScheduler();
-            testScheduler.ScheduleAbsolute(@event, 5, (_, state) =>
-            {
-                var IManagedMqttClientMock = mock.Mock<IManagedMqttClient>().Object;
-                mock.Mock<IManagedMqttClient>().Object.ApplicationMessageProcessedHandler.HandleApplicationMessageProcessedAsync(state);
-                return Disposable.Empty;
-            });
+            testScheduler.Schedule(TimeSpan.FromTicks(5), () =>
+                mock.Mock<IManagedMqttClient>().Raise(x => x.ApplicationMessageProcessedAsync -= null, (object)@event));
+
             // act
             var testObserver = testScheduler.Start(() => observable.PublishOn(rxMqttClinet), 0, 1, 10);
 
@@ -66,11 +60,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             using var mock = AutoMock.GetLoose();
 
             mock.Mock<IManagedMqttClient>()
-                .Setup(x => x.PublishAsync(It.IsAny<ManagedMqttApplicationMessage>())).Returns(Task.CompletedTask);
-            mock.Mock<IManagedMqttClient>()
-                .SetupProperty(x => x.ApplicationMessageProcessedHandler);
-            mock.Mock<IManagedMqttClient>()
-                .SetupProperty(x => x.ApplicationMessageSkippedHandler);
+                .Setup(x => x.EnqueueAsync(It.IsAny<ManagedMqttApplicationMessage>())).Returns(Task.CompletedTask);
             mock.Mock<IManagedMqttClient>()
                 .SetupGet(x => x.IsConnected)
                 .Returns(true);
@@ -81,19 +71,16 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithApplicationMessage(new MqttApplicationMessageBuilder()
                     .WithTopic("T")
                     .WithPayload("P")
-                    .WithExactlyOnceQoS()
+                    .WithQualityOfServiceLevel(Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
                     .Build())
                 .Build();
             var observable = Observable.Return(message);
             var @event = new ApplicationMessageSkippedEventArgs(message);
 
             var testScheduler = new TestScheduler();
-            testScheduler.ScheduleAbsolute(@event, 5, (_, state) =>
-            {
-                var IManagedMqttClientMock = mock.Mock<IManagedMqttClient>().Object;
-                mock.Mock<IManagedMqttClient>().Object.ApplicationMessageSkippedHandler.HandleApplicationMessageSkippedAsync(state);
-                return Disposable.Empty;
-            });
+            testScheduler.Schedule(TimeSpan.FromTicks(5), () =>
+                 mock.Mock<IManagedMqttClient>().Raise(x => x.ApplicationMessageSkippedAsync -= null, (object)@event));
+            
             // act
             var testObserver = testScheduler.Start(() => observable.PublishOn(rxMqttClinet), 0, 1, 10);
 
@@ -112,11 +99,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             using var mock = AutoMock.GetLoose();
 
             mock.Mock<IManagedMqttClient>()
-                .Setup(x => x.PublishAsync(It.IsAny<ManagedMqttApplicationMessage>())).Returns(Task.CompletedTask);
-            mock.Mock<IManagedMqttClient>()
-                .SetupProperty(x => x.ApplicationMessageProcessedHandler);
-            mock.Mock<IManagedMqttClient>()
-                .SetupProperty(x => x.ApplicationMessageSkippedHandler);
+                .Setup(x => x.EnqueueAsync(It.IsAny<ManagedMqttApplicationMessage>())).Returns(Task.CompletedTask);
             mock.Mock<IManagedMqttClient>()
                 .SetupGet(x => x.IsConnected)
                 .Returns(true);
@@ -127,19 +110,15 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithApplicationMessage(new MqttApplicationMessageBuilder()
                     .WithTopic("T")
                     .WithPayload("P")
-                    .WithExactlyOnceQoS()
+                    .WithQualityOfServiceLevel(Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
                     .Build())
                 .Build();
             var observable = Observable.Return(message);
             var @event = new ApplicationMessageProcessedEventArgs(message, null);
 
             var testScheduler = new TestScheduler();
-            testScheduler.ScheduleAbsolute(@event, 5, (_, state) =>
-            {
-                var IManagedMqttClientMock = mock.Mock<IManagedMqttClient>().Object;
-                mock.Mock<IManagedMqttClient>().Object.ApplicationMessageProcessedHandler.HandleApplicationMessageProcessedAsync(state);
-                return Disposable.Empty;
-            });
+            testScheduler.Schedule(TimeSpan.FromTicks(5), () =>
+                mock.Mock<IManagedMqttClient>().Raise(x => x.ApplicationMessageProcessedAsync -= null, (object )@event));
             // act
             var testObserver = testScheduler.Start(() => observable.PublishOn(rxMqttClinet), 0, 1, 10);
 
@@ -159,11 +138,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 
             var exception = new Exception();
             mock.Mock<IManagedMqttClient>()
-                .Setup(x => x.PublishAsync(It.IsAny<ManagedMqttApplicationMessage>())).Throws(exception);
-            mock.Mock<IManagedMqttClient>()
-                .SetupProperty(x => x.ApplicationMessageProcessedHandler);
-            mock.Mock<IManagedMqttClient>()
-                .SetupProperty(x => x.ApplicationMessageSkippedHandler);
+                .Setup(x => x.EnqueueAsync(It.IsAny<ManagedMqttApplicationMessage>())).Throws(exception);
             mock.Mock<IManagedMqttClient>()
                 .SetupGet(x => x.IsConnected)
                 .Returns(true);
@@ -174,19 +149,15 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithApplicationMessage(new MqttApplicationMessageBuilder()
                     .WithTopic("T")
                     .WithPayload("P")
-                    .WithExactlyOnceQoS()
+                    .WithQualityOfServiceLevel(Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
                     .Build())
                 .Build();
             var observable = Observable.Return(message);
             var @event = new ApplicationMessageProcessedEventArgs(message, exception);
 
             var testScheduler = new TestScheduler();
-            testScheduler.ScheduleAbsolute(@event, 5, (_, state) =>
-            {
-                var IManagedMqttClientMock = mock.Mock<IManagedMqttClient>().Object;
-                mock.Mock<IManagedMqttClient>().Object.ApplicationMessageProcessedHandler.HandleApplicationMessageProcessedAsync(state);
-                return Disposable.Empty;
-            });
+            testScheduler.Schedule(TimeSpan.FromTicks(5), () =>
+                mock.Mock<IManagedMqttClient>().Raise(x => x.ApplicationMessageProcessedAsync -= null, (object)@event));
             // act
             var testObserver = testScheduler.Start(() => observable.PublishOn(rxMqttClinet), 0, 1, 10);
 
@@ -213,7 +184,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithApplicationMessage(new MqttApplicationMessageBuilder()
                     .WithTopic("T")
                     .WithPayload("P")
-                    .WithExactlyOnceQoS()
+                    .WithQualityOfServiceLevel(Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
                     .Build())
                 .Build();
             var observable = Observable.Return(message);
@@ -262,7 +233,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             var message = new MqttApplicationMessageBuilder()
                 .WithTopic("T")
                 .WithPayload("P")
-                .WithExactlyOnceQoS()
+                .WithQualityOfServiceLevel(Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
                 .Build();
 
             var observable = Observable.Return(message);
@@ -304,11 +275,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             using var mock = AutoMock.GetLoose();
 
             mock.Mock<IManagedMqttClient>()
-                .Setup(x => x.PublishAsync(It.IsAny<ManagedMqttApplicationMessage>())).Returns(Task.CompletedTask);
-            mock.Mock<IManagedMqttClient>()
-                .SetupProperty(x => x.ApplicationMessageProcessedHandler);
-            mock.Mock<IManagedMqttClient>()
-                .SetupProperty(x => x.ApplicationMessageSkippedHandler);
+                .Setup(x => x.EnqueueAsync(It.IsAny<ManagedMqttApplicationMessage>())).Returns(Task.CompletedTask);
 
             var rxMqttClinet = mock.Create<RxMqttClient>();
 
@@ -316,7 +283,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithApplicationMessage(new MqttApplicationMessageBuilder()
                     .WithTopic("T")
                     .WithPayload("P")
-                    .WithExactlyOnceQoS()
+                    .WithQualityOfServiceLevel(Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
                     .Build())
                 .Build();
             var observable = Observable.Return(message);
@@ -372,7 +339,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             var message = new MqttApplicationMessageBuilder()
                 .WithTopic("T")
                 .WithPayload("P")
-                .WithExactlyOnceQoS()
+                .WithQualityOfServiceLevel(Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
                 .Build();
 
             var observable = Observable.Return(message);

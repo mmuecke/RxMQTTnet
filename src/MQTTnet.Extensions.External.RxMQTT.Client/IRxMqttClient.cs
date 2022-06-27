@@ -1,6 +1,5 @@
-﻿using MQTTnet.Client.Connecting;
-using MQTTnet.Client.Disconnecting;
-using MQTTnet.Diagnostics.Logger;
+﻿using MQTTnet.Client;
+using MQTTnet.Diagnostics;
 using MQTTnet.Extensions.ManagedClient;
 using System;
 using System.Threading;
@@ -9,14 +8,14 @@ using System.Threading.Tasks;
 namespace MQTTnet.Extensions.External.RxMQTT.Client
 {
     /// <summary>
-    /// A rx mqtt client based on a <see cref="IManagedMqttClient"/>.
+    /// A rx mqtt client based on a <see cref="ManagedMqttClient"/>.
     /// </summary>
     /// <remarks>
-    /// Use the <see cref="MqttFactoryExtensions.CreateRxMqttClient(IMqttFactory)"/> or
-    /// <see cref="MqttFactoryExtensions.CreateRxMqttClient(IMqttFactory, IMqttNetLogger)"/>
+    /// Use the <see cref="MqttFactoryExtensions.CreateRxMqttClient(MqttFactory)"/> or
+    /// <see cref="MqttFactoryExtensions.CreateRxMqttClient(MqttFactory, IMqttNetLogger)"/>
     /// factory methods to crate the client.
     /// </remarks>
-    public interface IRxMqttClient : IApplicationMessagePublisher, IDisposable
+    public interface IRxMqttClient : IDisposable
     {
         /// <summary>
         /// Observer for the connection state of the client.
@@ -26,17 +25,17 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// <summary>
         /// Observer for the connected event.
         /// </summary>
-        IObservable<MqttClientConnectedEventArgs> ConnectedEvent { get; }
+        IObservable<EventArgs> ConnectedEvent { get; }
 
         /// <summary>
         /// Observer for the connection failed event.
         /// </summary>
-        IObservable<ManagedProcessFailedEventArgs> ConnectingFailedEvent { get; }
+        IObservable<ConnectingFailedEventArgs> ConnectingFailedEvent { get; }
 
         /// <summary>
         /// Observer for the disconnected event.
         /// </summary>
-        IObservable<MqttClientDisconnectedEventArgs> DisconnectedEvent { get; }
+        IObservable<EventArgs> DisconnectedEvent { get; }
 
         /// <summary>
         /// Gets the internally used MQTT client.
@@ -59,7 +58,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// <summary>
         /// The options set for the client.
         /// </summary>
-        IManagedMqttClientOptions Options { get; }
+        ManagedMqttClientOptions Options { get; }
 
         /// <summary>
         /// The amount of pending messages.
@@ -103,11 +102,18 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         Task PublishAsync(ManagedMqttApplicationMessage applicationMessage);
 
         /// <summary>
+        /// Publish a message.
+        /// </summary>
+        /// <param name="applicationMessage">The message to publish.</param>
+        /// <returns>The publish task.</returns>
+        Task PublishAsync(MqttApplicationMessage applicationMessage);
+
+        /// <summary>
         /// Start the client whit the <paramref name="options"/>.
         /// </summary>
         /// <param name="options">The options for the client.</param>
         /// <returns>The start task.</returns>
-        Task StartAsync(IManagedMqttClientOptions options);
+        Task StartAsync(ManagedMqttClientOptions options);
 
         /// <summary>
         /// Stops the client.
