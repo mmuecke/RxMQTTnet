@@ -101,7 +101,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithPayload("P")
                 .WithQualityOfServiceLevel(Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
                 .Build();
-            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message, null, null);
+            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message, mock.Create<MqttPublishPacket>(), null);
             var testScheduler = new TestScheduler();
 
             // act
@@ -141,7 +141,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithPayload("P")
                 .WithQualityOfServiceLevel(Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
                 .Build();
-            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message, null, null);
+            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message, mock.Create<MqttPublishPacket>(), null);
             var testScheduler = new TestScheduler();
 
             // act
@@ -171,7 +171,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithPayload("P")
                 .WithQualityOfServiceLevel(Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
                 .Build();
-            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message, null, null);
+            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message, mock.Create<MqttPublishPacket>(), null);
             var testScheduler = new TestScheduler();
 
             // act
@@ -196,7 +196,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithPayload("P")
                 .WithQualityOfServiceLevel(Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
                 .Build();
-            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message, null, null);
+            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message, mock.Create<MqttPublishPacket>(), null);
             var testScheduler = new TestScheduler();
 
             // act
@@ -221,7 +221,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithPayload("P")
                 .WithQualityOfServiceLevel(Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
                 .Build();
-            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message, null, null);
+            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message, mock.Create<MqttPublishPacket>(), null);
             var testScheduler = new TestScheduler();
 
             // act

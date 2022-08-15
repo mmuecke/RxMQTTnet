@@ -1,5 +1,7 @@
-﻿using Microsoft.Reactive.Testing;
+﻿using Autofac.Extras.Moq;
+using Microsoft.Reactive.Testing;
 using MQTTnet.Client;
+using MQTTnet.Packets;
 using MQTTnet.Protocol;
 using System;
 using System.Linq;
@@ -17,12 +19,13 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         [InlineData(MqttQualityOfServiceLevel.AtLeastOnce, false)]
         public void FilterQoS_ApplicationEvent(MqttQualityOfServiceLevel filter, bool success)
         {
+            using var mock = AutoMock.GetLoose();
             var message = new MqttApplicationMessageBuilder()
                 .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();
-            var @event = new MqttApplicationMessageReceivedEventArgs("C", message, null, null);
+            var @event = new MqttApplicationMessageReceivedEventArgs("C", message, mock.Create<MqttPublishPacket>(), null);
 
             var observable = Observable.Return(@event).FilterQoS(filter);
 
@@ -108,12 +111,13 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         [InlineData("N", false)]
         public void FilterTopic_ApplicationMessage(string filter, bool success)
         {
+            using var mock = AutoMock.GetLoose();
             var message = new MqttApplicationMessageBuilder()
                 .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();
-            var @event = new MqttApplicationMessageReceivedEventArgs("C", message, null, null);
+            var @event = new MqttApplicationMessageReceivedEventArgs("C", message, mock.Create<MqttPublishPacket>(), null);
 
             var observable = Observable.Return(@event).FilterTopic(filter);
 
@@ -143,12 +147,13 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         [Fact]
         public void GetPayload()
         {
+            using var mock = AutoMock.GetLoose();
             var message = new MqttApplicationMessageBuilder()
                 .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();
-            var @event = new MqttApplicationMessageReceivedEventArgs("C", message, null, null);
+            var @event = new MqttApplicationMessageReceivedEventArgs("C", message, mock.Create<MqttPublishPacket>(), null);
 
             var observable = Observable.Return(@event).SelectPayload();
 
@@ -162,12 +167,13 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         [Fact]
         public void GetPayload_T_FromEvent()
         {
+            using var mock = AutoMock.GetLoose();
             var message = new MqttApplicationMessageBuilder()
                 .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();
-            var @event = new MqttApplicationMessageReceivedEventArgs("C", message, null, null);
+            var @event = new MqttApplicationMessageReceivedEventArgs("C", message, mock.Create<MqttPublishPacket>(), null);
 
             var observable = Observable.Return(@event).SelectPayload(p => p);
 
@@ -181,12 +187,13 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         [Fact]
         public void SelectMessage()
         {
+            using var mock = AutoMock.GetLoose();
             var message = new MqttApplicationMessageBuilder()
                 .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();
-            var @event = new MqttApplicationMessageReceivedEventArgs("C", message, null, null);
+            var @event = new MqttApplicationMessageReceivedEventArgs("C", message, mock.Create<MqttPublishPacket>(), null);
 
             var observable = Observable.Return(@event).SelectMessage();
 
@@ -258,12 +265,13 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         [InlineData(false)]
         public void SelectPayload_T_FromEvent_Exception(bool skipOnError)
         {
+            using var mock = AutoMock.GetLoose();
             var message = new MqttApplicationMessageBuilder()
                 .WithQualityOfServiceLevel(MqttQualityOfServiceLevel.ExactlyOnce)
                 .WithTopic("T")
                 .WithPayload("P")
                 .Build();
-            var @event = new MqttApplicationMessageReceivedEventArgs("C", message, null, null);
+            var @event = new MqttApplicationMessageReceivedEventArgs("C", message, mock.Create<MqttPublishPacket>(), null);
             var ex = new Exception();
             var observable = Observable.Return(@event).SelectPayload<byte[]>(p => throw ex, skipOnError);
 
