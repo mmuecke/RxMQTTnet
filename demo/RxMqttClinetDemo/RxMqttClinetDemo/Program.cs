@@ -1,6 +1,6 @@
 ﻿using ConsoleTools;
 using MQTTnet;
-using MQTTnet.Client.Options;
+using MQTTnet.Client;
 using MQTTnet.Extensions.External.RxMQTT.Client;
 using MQTTnet.Extensions.ManagedClient;
 using System;
@@ -44,7 +44,7 @@ namespace RxMqttClinetDemo
                    .Select(_ => new MqttApplicationMessageBuilder()
                        .WithTopic("MyTopic")
                        .WithPayload("Hello World rx: " + DateTime.Now.ToLongTimeString())
-                       .WithExactlyOnceQoS()
+                       .WithQualityOfServiceLevel(MQTTnet.Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
                        .WithRetainFlag()
                        .Build())
                    .PublishOn(mqttClient)
