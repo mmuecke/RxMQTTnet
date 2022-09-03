@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace MQTTnet.Extensions.External.RxMQTT.Client
 {
     /// <summary>
-    /// A mqtt client using <see cref="System.Reactive"/> for subscribing to topics.
+    /// A mqtt client using <see cref="System.Reactive" /> for subscribing to topics.
     /// </summary>
     public class RxMqttClient : Internal.Disposable, IRxMqttClient
     {
@@ -22,17 +22,20 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
 
         private readonly IDisposable cleanUp;
         private readonly MqttNetSourceLogger logger;
+        private readonly object setHandledLock = new object();
         private readonly Dictionary<string, IObservable<MqttApplicationMessageReceivedEventArgs>> topicSubscriptionCache;
         private readonly object topicSubscriptionLock = new object();
 
         /// <summary>
-        /// Create a rx mqtt client based on a <see cref="ManagedMqttClient"/>.
+        /// Create a rx mqtt client based on a <see cref="ManagedMqttClient" />.
         /// </summary>
         /// <param name="managedMqttClient">The manged mqtt client.</param>
         /// <param name="logger">The mqtt net logger.</param>
         /// <remarks>
-        /// Use the <see cref="MqttFactoryExtensions.CreateRxMqttClient(MqttFactory)"/> or
-        /// <see cref="MqttFactoryExtensions.CreateRxMqttClient(MqttFactory, IMqttNetLogger)"/>
+        /// Use the
+        /// <see cref="MqttFactoryExtensions.CreateRxMqttClient(MqttFactory)" />
+        /// or
+        /// <see cref="MqttFactoryExtensions.CreateRxMqttClient(MqttFactory, IMqttNetLogger)" />
         /// factory methods to crate the client.
         /// </remarks>
         /// <exception cref="ArgumentNullException"></exception>
@@ -114,43 +117,43 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             });
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public IObservable<ApplicationMessageProcessedEventArgs> ApplicationMessageProcessedEvent { get; }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public IObservable<ApplicationMessageSkippedEventArgs> ApplicationMessageSkippedEvent { get; }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public IObservable<bool> Connected { get; }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public IObservable<EventArgs> ConnectedEvent { get; }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public IObservable<ConnectingFailedEventArgs> ConnectingFailedEvent { get; }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public IObservable<EventArgs> DisconnectedEvent { get; }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public IManagedMqttClient InternalClient { get; }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public bool IsConnected => InternalClient.IsConnected;
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public bool IsStarted => InternalClient.IsStarted;
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public ManagedMqttClientOptions Options => InternalClient.Options;
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public int PendingApplicationMessagesCount => InternalClient.PendingApplicationMessagesCount;
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public IObservable<ManagedProcessFailedEventArgs> SynchronizingSubscriptionsFailedEvent { get; }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         /// <exception cref="ArgumentException"></exception>
         public IObservable<MqttApplicationMessageReceivedEventArgs> Connect(string topic)
         {
@@ -182,10 +185,23 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                                 return Disposable.Empty;
                             }
 
-                            // filter all received messages
-                            // and subscribe to messages for this topic
+                            // filter all received messages and subscribe to
+                            // messages for this topic
                             var messageSubscription = applicationMessageReceived
                                 .FilterTopic(topic)
+                                .Where(message =>
+                                {
+                                    // set handled after first filter match
+                                    // to avoid getting messages for subscriptions to e.g.
+                                    //  - A/*
+                                    //  - A/B
+                                    lock (setHandledLock)
+                                    {
+                                        var isHandled = message.IsHandled;
+                                        message.IsHandled = true;
+                                        return !isHandled;
+                                    }
+                                })
                                 .Subscribe(observer);
 
                             return Disposable.Create(async () =>
@@ -216,13 +232,13 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             }
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public Task PingAsync(CancellationToken cancellationToken)
         {
             return InternalClient.PingAsync(cancellationToken);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         /// <exception cref="ArgumentNullException"></exception>
         public Task PublishAsync(ManagedMqttApplicationMessage applicationMessage)
         {
@@ -231,7 +247,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             return InternalClient.EnqueueAsync(applicationMessage);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         /// <exception cref="ArgumentNullException"></exception>
         public Task PublishAsync(MqttApplicationMessage applicationMessage)
         {
@@ -240,7 +256,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             return InternalClient.EnqueueAsync(applicationMessage);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         /// <exception cref="ArgumentNullException"></exception>
         public Task StartAsync(ManagedMqttClientOptions options)
         {
@@ -249,13 +265,13 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
             return InternalClient.StartAsync(options);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public Task StopAsync()
         {
             return InternalClient.StopAsync();
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
             cleanUp.Dispose();

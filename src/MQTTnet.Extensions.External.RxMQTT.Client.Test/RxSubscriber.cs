@@ -96,22 +96,29 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 
             var rxMqttClinet = mock.Create<RxMqttClient>();
 
-            var message = new MqttApplicationMessageBuilder()
+            var message1 = new MqttApplicationMessageBuilder()
                 .WithTopic("T")
-                .WithPayload("P")
+                .WithPayload("P1")
                 .WithQualityOfServiceLevel(Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
                 .Build();
-            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message, mock.Create<MqttPublishPacket>(), null);
+
+            var message2 = new MqttApplicationMessageBuilder()
+                .WithTopic("T")
+                .WithPayload("P2")
+                .WithQualityOfServiceLevel(Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
+                .Build();
+            var eventArgs1 = new MqttApplicationMessageReceivedEventArgs("1", message1, mock.Create<MqttPublishPacket>(), null);
+            var eventArgs2 = new MqttApplicationMessageReceivedEventArgs("1", message2, mock.Create<MqttPublishPacket>(), null);
+
             var testScheduler = new TestScheduler();
 
             // act
             var firstCount = 0;
             var first = rxMqttClinet.Connect("T").Subscribe(_ => firstCount++);
 
-
-            testScheduler.Schedule(TimeSpan.FromTicks(2), () => mock.Mock<IManagedMqttClient>().Raise(x => x.ApplicationMessageReceivedAsync += null, (object)eventArgs));
+            testScheduler.Schedule(TimeSpan.FromTicks(2), () => mock.Mock<IManagedMqttClient>().Raise(x => x.ApplicationMessageReceivedAsync += null, (object)eventArgs1));
             testScheduler.Schedule(TimeSpan.FromTicks(3), () => first.Dispose());
-            testScheduler.Schedule(TimeSpan.FromTicks(4), () => mock.Mock<IManagedMqttClient>().Raise(x => x.ApplicationMessageReceivedAsync += null, (object)eventArgs));
+            testScheduler.Schedule(TimeSpan.FromTicks(4), () => mock.Mock<IManagedMqttClient>().Raise(x => x.ApplicationMessageReceivedAsync += null, (object)eventArgs2));
 
             var result = testScheduler.Start(() =>
             {
@@ -123,8 +130,8 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             Assert.Equal(2, result.Messages.Count);
             Assert.Equal(NotificationKind.OnNext, result.Messages.First().Value.Kind);
             Assert.Equal(NotificationKind.OnNext, result.Messages.Last().Value.Kind);
-            Assert.Equal(eventArgs, result.Messages.First().Value.Value);
-            Assert.Equal(eventArgs, result.Messages.Last().Value.Value);
+            Assert.Equal(eventArgs1, result.Messages.First().Value.Value);
+            Assert.Equal(eventArgs2, result.Messages.Last().Value.Value);
             Assert.Equal(1, firstCount);
         }
 
@@ -136,25 +143,33 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 
             var rxMqttClinet = mock.Create<RxMqttClient>();
 
-            var message = new MqttApplicationMessageBuilder()
+            var message1 = new MqttApplicationMessageBuilder()
                 .WithTopic("T")
-                .WithPayload("P")
+                .WithPayload("P1")
                 .WithQualityOfServiceLevel(Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
                 .Build();
-            var eventArgs = new MqttApplicationMessageReceivedEventArgs("1", message, mock.Create<MqttPublishPacket>(), null);
+
+            var message2 = new MqttApplicationMessageBuilder()
+                .WithTopic("T")
+                .WithPayload("P2")
+                .WithQualityOfServiceLevel(Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
+                .Build();
+            var eventArgs1 = new MqttApplicationMessageReceivedEventArgs("1", message1, mock.Create<MqttPublishPacket>(), null);
+            var eventArgs2 = new MqttApplicationMessageReceivedEventArgs("1", message2, mock.Create<MqttPublishPacket>(), null);
+
             var testScheduler = new TestScheduler();
 
             // act
-            testScheduler.Schedule(TimeSpan.FromTicks(2), () => mock.Mock<IManagedMqttClient>().Raise(x => x.ApplicationMessageReceivedAsync += null, (object)eventArgs));
-            testScheduler.Schedule(TimeSpan.FromTicks(3), () => mock.Mock<IManagedMqttClient>().Raise(x => x.ApplicationMessageReceivedAsync += null, (object)eventArgs));
+            testScheduler.Schedule(TimeSpan.FromTicks(2), () => mock.Mock<IManagedMqttClient>().Raise(x => x.ApplicationMessageReceivedAsync += null, (object)eventArgs1));
+            testScheduler.Schedule(TimeSpan.FromTicks(3), () => mock.Mock<IManagedMqttClient>().Raise(x => x.ApplicationMessageReceivedAsync += null, (object)eventArgs2));
             var result = testScheduler.Start(() => rxMqttClinet.Connect("T"), 0, 0, 4);
 
             // test
             Assert.Equal(2, result.Messages.Count);
             Assert.Equal(NotificationKind.OnNext, result.Messages.First().Value.Kind);
             Assert.Equal(NotificationKind.OnNext, result.Messages.Last().Value.Kind);
-            Assert.Equal(eventArgs, result.Messages.First().Value.Value);
-            Assert.Equal(eventArgs, result.Messages.Last().Value.Value);
+            Assert.Equal(eventArgs1, result.Messages.First().Value.Value);
+            Assert.Equal(eventArgs2, result.Messages.Last().Value.Value);
         }
 
         [Fact]
@@ -232,6 +247,46 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             Assert.Single(result.Messages);
             Assert.Equal(NotificationKind.OnNext, result.Messages.Single().Value.Kind);
             Assert.Equal(eventArgs, result.Messages.Single().Value.Value);
+        }
+
+        [Fact]
+        public void Publisch_Subscribe_WithTwoSubscriptions_ReciveOnce()
+        {
+            using var mock = AutoMock.GetLoose();
+            mock.Mock<IManagedMqttClient>();
+
+            var rxMqttClinet = mock.Create<RxMqttClient>();
+
+            var message1 = new MqttApplicationMessageBuilder()
+                .WithTopic("T/A")
+                .WithPayload("P1")
+                .WithQualityOfServiceLevel(Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
+                .Build();
+
+            var message2 = new MqttApplicationMessageBuilder()
+                .WithTopic("T/A")
+                .WithPayload("P2")
+                .WithQualityOfServiceLevel(Protocol.MqttQualityOfServiceLevel.ExactlyOnce)
+                .Build();
+            var eventArgs1 = new MqttApplicationMessageReceivedEventArgs("1", message1, mock.Create<MqttPublishPacket>(), null);
+            var eventArgs2 = new MqttApplicationMessageReceivedEventArgs("1", message2, mock.Create<MqttPublishPacket>(), null);
+
+            var testScheduler = new TestScheduler();
+
+            // act
+            testScheduler.Schedule(TimeSpan.FromTicks(2), () => mock.Mock<IManagedMqttClient>().Raise(x => x.ApplicationMessageReceivedAsync += null, (object)eventArgs1));
+            testScheduler.Schedule(TimeSpan.FromTicks(3), () => mock.Mock<IManagedMqttClient>().Raise(x => x.ApplicationMessageReceivedAsync += null, (object)eventArgs2));
+
+            // set up first subscription
+            var result = testScheduler
+                .Start(() => rxMqttClinet.Connect("T/A").Merge(rxMqttClinet.Connect("T/+")), 0, 0, 4);
+
+            // test
+            Assert.Equal(2, result.Messages.Count);
+            Assert.Equal(NotificationKind.OnNext, result.Messages.First().Value.Kind);
+            Assert.Equal(NotificationKind.OnNext, result.Messages.Last().Value.Kind);
+            Assert.Equal(eventArgs1, result.Messages.First().Value.Value);
+            Assert.Equal(eventArgs2, result.Messages.Last().Value.Value);
         }
 
         [Fact]
