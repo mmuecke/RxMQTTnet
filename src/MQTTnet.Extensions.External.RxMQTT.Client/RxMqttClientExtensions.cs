@@ -45,22 +45,22 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// Filter the stream by a topic.
         /// </summary>
         /// <param name="source">The source observable.</param>
-        /// <param name="topic">The level to filter for.</param>
+        /// <param name="filter">The level to filter for.</param>
         /// <returns>The filtered source.</returns>
         /// <remarks>Wildcards '#' and '+' are allowed.</remarks>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentException"></exception>
         public static IObservable<MqttApplicationMessageReceivedEventArgs> FilterTopic(
-            this IObservable<MqttApplicationMessageReceivedEventArgs> source, string topic)
+            this IObservable<MqttApplicationMessageReceivedEventArgs> source, string filter)
         {
             if (source is null) throw new ArgumentNullException(nameof(source));
-            if (string.IsNullOrWhiteSpace(topic)) throw new ArgumentException($"'{nameof(topic)}' cannot be null or whitespace", nameof(topic));
+            if (string.IsNullOrWhiteSpace(filter)) throw new ArgumentException($"'{nameof(filter)}' cannot be null or whitespace", nameof(filter));
 
             return Observable.Create<MqttApplicationMessageReceivedEventArgs>(observer =>
             {
-                var topicFilter = new TopicFilter(topic);
                 return source
-                    .Where(@event => topicFilter.IsTopicMatch(@event.ApplicationMessage.Topic))
+                    .Where(@event => 
+                    MqttTopicFilterComparer.Compare(@event.ApplicationMessage.Topic, filter) == MqttTopicFilterCompareResult.IsMatch)
                     .SubscribeSafe(observer);
             });
         }
@@ -69,22 +69,22 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// Filter the stream by a topic.
         /// </summary>
         /// <param name="source">The source observable.</param>
-        /// <param name="topic">The level to filter for.</param>
+        /// <param name="filter">The level to filter for.</param>
         /// <returns>The filtered source.</returns>
         /// <remarks>Wildcards '#' and '+' are allowed.</remarks>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="ArgumentException"></exception>
         public static IObservable<MqttApplicationMessage> FilterTopic(
-            this IObservable<MqttApplicationMessage> source, string topic)
+            this IObservable<MqttApplicationMessage> source, string filter)
         {
             if (source is null) throw new ArgumentNullException(nameof(source));
-            if (string.IsNullOrWhiteSpace(topic)) throw new ArgumentException($"'{nameof(topic)}' cannot be null or whitespace", nameof(topic));
+            if (string.IsNullOrWhiteSpace(filter)) throw new ArgumentException($"'{nameof(filter)}' cannot be null or whitespace", nameof(filter));
 
             return Observable.Create<MqttApplicationMessage>(observer =>
             {
-                var topicFilter = new TopicFilter(topic);
                 return source
-                    .Where(message => topicFilter.IsTopicMatch(message.Topic))
+                    .Where(message =>
+                        MqttTopicFilterComparer.Compare(message.Topic, filter) == MqttTopicFilterCompareResult.IsMatch)
                     .SubscribeSafe(observer);
             });
         }
