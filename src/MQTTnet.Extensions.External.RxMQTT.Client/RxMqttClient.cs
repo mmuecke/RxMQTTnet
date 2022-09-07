@@ -1,6 +1,7 @@
 ﻿using MQTTnet.Client;
 using MQTTnet.Diagnostics;
 using MQTTnet.Extensions.ManagedClient;
+using ReactiveMarbles.ObservableEvents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,29 +50,25 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
 
             var cancelationSubject = new Subject<Unit>();
 
-            ConnectedEvent = FromAsyncEvent<EventArgs>(
-                h => managedMqttClient.ConnectedAsync += h,
-                h => managedMqttClient.ConnectedAsync -= h);
+            var managedMqttClientEvents = managedMqttClient.Events();
 
-            DisconnectedEvent = FromAsyncEvent<EventArgs>(
-                h => managedMqttClient.DisconnectedAsync += h,
-                h => managedMqttClient.DisconnectedAsync -= h);
+            ConnectedEvent = managedMqttClientEvents.ConnectedAsync
+                .TakeUntil(cancelationSubject);
 
-            ConnectingFailedEvent = FromAsyncEvent<ConnectingFailedEventArgs>(
-                h => managedMqttClient.ConnectingFailedAsync += h,
-                h => managedMqttClient.ConnectingFailedAsync -= h);
+            DisconnectedEvent = managedMqttClientEvents.DisconnectedAsync
+                .TakeUntil(cancelationSubject);
 
-            SynchronizingSubscriptionsFailedEvent = FromAsyncEvent<ManagedProcessFailedEventArgs>(
-                h => managedMqttClient.SynchronizingSubscriptionsFailedAsync += h,
-                h => managedMqttClient.SynchronizingSubscriptionsFailedAsync -= h);
+            ConnectingFailedEvent = managedMqttClientEvents.ConnectingFailedAsync
+                .TakeUntil(cancelationSubject);
 
-            ApplicationMessageProcessedEvent = FromAsyncEvent<ApplicationMessageProcessedEventArgs>(
-                h => managedMqttClient.ApplicationMessageProcessedAsync += h,
-                h => managedMqttClient.ApplicationMessageProcessedAsync -= h);
+            SynchronizingSubscriptionsFailedEvent = managedMqttClientEvents.SynchronizingSubscriptionsFailedAsync
+                .TakeUntil(cancelationSubject);
 
-            ApplicationMessageSkippedEvent = FromAsyncEvent<ApplicationMessageSkippedEventArgs>(
-                h => managedMqttClient.ApplicationMessageSkippedAsync += h,
-                h => managedMqttClient.ApplicationMessageSkippedAsync -= h);
+            ApplicationMessageProcessedEvent = managedMqttClientEvents.ApplicationMessageProcessedAsync
+                .TakeUntil(cancelationSubject);
+
+            ApplicationMessageSkippedEvent = managedMqttClientEvents.ApplicationMessageSkippedAsync
+                .TakeUntil(cancelationSubject);
 
             Connected = Observable
                 .Create<bool>(observer =>
@@ -86,27 +83,8 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                 .Replay(1)                          // replay last state on subscribe
                 .RefCount();                        // count subscriptions and dispose source observable when no subscription
 
-            applicationMessageReceived = FromAsyncEvent<MqttApplicationMessageReceivedEventArgs>(
-                h => managedMqttClient.ApplicationMessageReceivedAsync += h,
-                h => managedMqttClient.ApplicationMessageReceivedAsync -= h);
-
-            IObservable<T> FromAsyncEvent<T>(Action<Func<T, Task>> addHandler, Action<Func<T, Task>> removeHandler)
-            {
-                return Observable
-                    .Create<T>(observer =>
-                    {
-                        Task Delegate(T args)
-                        {
-                            observer.OnNext(args);
-                            return Task.CompletedTask;
-                        }
-                        addHandler(Delegate);
-                        return Disposable.Create(() => removeHandler(Delegate));
-                    })
-                    .TakeUntil(cancelationSubject)  // complete on dispose
-                    .Publish()                      // publish from on source observable
-                    .RefCount();                    // count subscriptions and dispose source observable when no subscription
-            }
+            applicationMessageReceived = managedMqttClientEvents.ApplicationMessageReceivedAsync
+                .TakeUntil(cancelationSubject);
 
             cleanUp = Disposable.Create(() =>
             {
