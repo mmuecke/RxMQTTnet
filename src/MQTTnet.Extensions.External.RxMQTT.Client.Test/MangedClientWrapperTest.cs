@@ -9,6 +9,7 @@ using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
@@ -146,9 +147,10 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             var testScheduler = new TestScheduler();
 
             testScheduler.Schedule(TimeSpan.FromTicks(2), () =>
-                mock.Mock<IManagedMqttClient>().Raise(x => x.ConnectedAsync += null, (object)EventArgs.Empty));
+                mock.Mock<IManagedMqttClient>().Raise(x => x.ConnectedAsync += null, (Func<MqttClientConnectedEventArgs, Task>)null));
             testScheduler.Schedule(TimeSpan.FromTicks(3), () =>
-                mock.Mock<IManagedMqttClient>().Raise(x => x.DisconnectedAsync += null, (object)EventArgs.Empty));
+                mock.Mock<IManagedMqttClient>().Raise(x => x.DisconnectedAsync += null, (Func<MqttClientDisconnectedEventArgs, Task>)null));
+           
             // act
             var testObserver = testScheduler.Start(() => rxMqttClinet.Connected, 0, 1, 4);
 
