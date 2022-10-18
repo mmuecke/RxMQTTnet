@@ -145,7 +145,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             var rxMqttClinet = mock.Create<RxMqttClient>();
 
             var testScheduler = new TestScheduler();
-            Func<MqttClientConnectedEventArgs, Task> d = null;
+
             testScheduler.Schedule(TimeSpan.FromTicks(2), () =>
                 mock.Mock<IManagedMqttClient>().Raise(x => x.ConnectedAsync += null, (Func<MqttClientConnectedEventArgs, Task>)null));
             testScheduler.Schedule(TimeSpan.FromTicks(3), () =>
