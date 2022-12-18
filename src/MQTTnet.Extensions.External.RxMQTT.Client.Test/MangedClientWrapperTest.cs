@@ -419,7 +419,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             await rxMqttClinet.StopAsync();
 
             // test
-            mock.Mock<IManagedMqttClient>().Verify(x => x.StopAsync());
+            mock.Mock<IManagedMqttClient>().Verify(x => x.StopAsync(true));
         }
 
         [Fact]

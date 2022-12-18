@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <Title>RxMQTTClient</Title>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.1;net6.0;net7.0</TargetFrameworks>
     <Description>A extension to the MQTTnet ManagedMqttClient, to transform the subscriptions into observables.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="4.1.2.350" />
+    <PackageReference Include="MQTTnet.Extensions.ManagedClient" Version="4.1.4.563" />
 	<PackageReference Include="ReactiveMarbles.ObservableEvents.SourceGenerator" Version="1.2.3">
 	  <PrivateAssets>all</PrivateAssets>
 	  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
