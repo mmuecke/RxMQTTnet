@@ -49,7 +49,7 @@ jobs:
       run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
     - name: Run Unit Tests
-      run: dotnet test --no-build -c:${{ env.configuration }} -p:CollectCoverage=true -p:CoverletOutputFormat=cobertura -p:CoverletOutput="../../artifacts/coverage/coverage.xml" -p:Include="[${{ env.productNamespacePrefix}}*]*"
+      run: dotnet test --no-build -c:${{ env.configuration }} -p:CollectCoverage=true -p:CoverletOutputFormat=cobertura -p:CoverletOutput="../../../artifacts/coverage/coverage.xml" -p:Include="[${{ env.productNamespacePrefix}}*]*"
       working-directory: src
 
     - name: Generate Coverage Report
