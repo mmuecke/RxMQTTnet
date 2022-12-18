@@ -60,7 +60,7 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos, otherwise set api token in repository secrets
-        files: */coverage.cobertura.xml
+        files: "*/coverage.cobertura.xml"
         directory: src
 
     - name: Create NuGet Artifacts
