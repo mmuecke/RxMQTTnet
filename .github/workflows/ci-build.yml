@@ -54,7 +54,7 @@ jobs:
 
     - name: Generate Coverage Report
       run: reportgenerator -reports:"coverage.xml" -targetdir:report-output
-      working-directory: artifacts/coverage
+      working-directory: src/artifacts/coverage
 
     - name: Upload Code Coverage
       uses: codecov/codecov-action@v1
