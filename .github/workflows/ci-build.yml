@@ -25,7 +25,7 @@ jobs:
     - name: Install .NET Core
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 7.0.x
 
     - name: NBGV
       id: nbgv
@@ -49,7 +49,9 @@ jobs:
       run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
     - name: Run Unit Tests
-      run: dotnet test --no-build -c:${{ env.configuration }} -p:CollectCoverage=true -p:CoverletOutputFormat=cobertura -p:CoverletOutput="./artifacts/coverage/coverage.xml" -p:Include="[${{ env.productNamespacePrefix}}*]*"
+      run: dotnet test --no-build -c:${{ env.configuration }}
+
+      -p:CollectCoverage=true --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.CoverletOutput="../../artifacts/coverage/coverage.xml" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Include="[${{ env.productNamespacePrefix}}*]*"
       working-directory: src
 
     - name: Generate Coverage Report
