@@ -49,12 +49,12 @@ jobs:
       run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
     - name: Run Unit Tests
-      run: dotnet test --no-build -c:${{ env.configuration }} --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.CoverletOutput="../../artifacts/coverage/coverage.xml" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Include="[${{ env.productNamespacePrefix}}*]*"
+      run: dotnet test --no-build -c:${{ env.configuration }} --collect:"XPlat Code Coverage" --DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura --DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.CoverletOutput="../../artifacts/coverage/coverage.xml" --DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Include="[${{ env.productNamespacePrefix}}*]*"
       working-directory: src
 
     - name: Generate Coverage Report
-      run: reportgenerator -reports:"coverage.xml" -targetdir:report-output
-      working-directory: src/artifacts/coverage
+      run: reportgenerator -reports:"**/coverage.cobertura.xml" -targetdir:report-output
+      working-directory: src
 
     - name: Upload Code Coverage
       uses: codecov/codecov-action@v1
