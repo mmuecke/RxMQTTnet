@@ -57,10 +57,11 @@ jobs:
       working-directory: src
 
     - name: Upload Code Coverage
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v3
       with:
         token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos, otherwise set api token in repository secrets
-        directory: artifacts/coverage
+        files: */coverage.cobertura.xml
+        directory: src
 
     - name: Create NuGet Artifacts
       uses: actions/upload-artifact@master
