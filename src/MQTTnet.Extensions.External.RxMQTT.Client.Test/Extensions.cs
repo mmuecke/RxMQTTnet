@@ -181,7 +181,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 
             var observableResult = testScheduler.Start(() => observable, 0, 0, 1);
 
-            Assert.Equal(message.Payload, observableResult.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnNext).First().Value.Value);
+            Assert.Equal(message.PayloadSegment, observableResult.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnNext).First().Value.Value);
         }
 
         [Fact]

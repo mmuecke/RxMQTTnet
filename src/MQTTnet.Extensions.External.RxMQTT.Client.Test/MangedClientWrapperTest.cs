@@ -3,7 +3,9 @@ using Microsoft.Reactive.Testing;
 using MQTTnet.Client;
 using MQTTnet.Diagnostics;
 using MQTTnet.Extensions.ManagedClient;
+using MQTTnet.Packets;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
@@ -150,7 +152,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 mock.Mock<IManagedMqttClient>().Raise(x => x.ConnectedAsync += null, (Func<MqttClientConnectedEventArgs, Task>)null));
             testScheduler.Schedule(TimeSpan.FromTicks(3), () =>
                 mock.Mock<IManagedMqttClient>().Raise(x => x.DisconnectedAsync += null, (Func<MqttClientDisconnectedEventArgs, Task>)null));
-           
+
             // act
             var testObserver = testScheduler.Start(() => rxMqttClinet.Connected, 0, 1, 4);
 
@@ -430,11 +432,14 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 
             var testScheduler = new TestScheduler();
 
-            var @event = new ManagedProcessFailedEventArgs(new Exception());
+            var @event = new ManagedProcessFailedEventArgs(
+                new Exception(),
+                new List<MqttTopicFilter>(),
+                new List<string>());
 
             testScheduler.Schedule(TimeSpan.FromTicks(2), () =>
                 mock.Mock<IManagedMqttClient>().Raise(x => x.SynchronizingSubscriptionsFailedAsync += null, (object)@event));
-          
+
             // act
             var testObserver = testScheduler.Start(() => rxMqttClinet.SynchronizingSubscriptionsFailedEvent, 0, 0, 4);
 
