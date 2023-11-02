@@ -11,6 +11,7 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
+using MQTTnet.Protocol;
 
 namespace MQTTnet.Extensions.External.RxMQTT.Client
 {
@@ -133,7 +134,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
 
         /// <inheritdoc />
         /// <exception cref="ArgumentException"></exception>
-        public IObservable<MqttApplicationMessageReceivedEventArgs> Connect(string topic)
+        public IObservable<MqttApplicationMessageReceivedEventArgs> Connect(string topic, MqttQualityOfServiceLevel qualityOfService = MqttQualityOfServiceLevel.AtMostOnce)
         {
             if (string.IsNullOrWhiteSpace(topic))
                 throw new ArgumentException($"'{nameof(topic)}' cannot be null or whitespace", nameof(topic));
@@ -153,6 +154,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                             {
                                 var mqttTopicFilter = new MqttTopicFilterBuilder()
                                     .WithTopic(topic)
+                                    .WithQualityOfServiceLevel(qualityOfService)
                                     .Build();
                                 await InternalClient.SubscribeAsync(new[] { mqttTopicFilter }).ConfigureAwait(false);
                             }
