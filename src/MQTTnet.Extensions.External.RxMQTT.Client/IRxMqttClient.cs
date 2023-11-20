@@ -4,6 +4,7 @@ using MQTTnet.Extensions.ManagedClient;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using MQTTnet.Protocol;
 
 namespace MQTTnet.Extensions.External.RxMQTT.Client
 {
@@ -80,12 +81,14 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
         /// </summary>
         IObservable<ApplicationMessageSkippedEventArgs> ApplicationMessageSkippedEvent { get; }
 
+  
         /// <summary>
         /// Connect to a subscription to the <paramref name="topic"/>.
         /// </summary>
         /// <param name="topic">The topic to subscribe.</param>
+        /// <param name="qualityOfService">The quality of service level to connect(subscribe) to, default to AtMostOnce <paramref name="qualityOfService"/></param>
         /// <returns>A observer for the messages on the <paramref name="topic"/>.</returns>
-        IObservable<MqttApplicationMessageReceivedEventArgs> Connect(string topic);
+        IObservable<MqttApplicationMessageReceivedEventArgs> Connect(string topic, MqttQualityOfServiceLevel qualityOfService = MqttQualityOfServiceLevel.AtMostOnce);
 
         /// <summary>
         /// Ping the server.
