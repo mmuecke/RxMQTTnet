@@ -89,7 +89,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 		}
 
 		[Fact]
-		public void Publisch_2Subscribe_2Recive_1Dispose_1Recive_Dispose()
+		public void Publish_2Subscribe_2Recive_1Dispose_1Recive_Dispose()
 		{
 			using var mock = AutoMock.GetLoose();
 			mock.Mock<IManagedMqttClient>();
@@ -136,7 +136,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 		}
 
 		[Fact]
-		public void Publisch_Subscribe_Once_And_2Recive_Dispose()
+		public void Publish_Subscribe_Once_And_2Recive_Dispose()
 		{
 			using var mock = AutoMock.GetLoose();
 			mock.Mock<IManagedMqttClient>();
@@ -173,7 +173,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 		}
 
 		[Fact]
-		public void Publisch_Subscribe_Once_And_Dispose_Client()
+		public void Publish_Subscribe_Once_And_Dispose_Client()
 		{
 			using var mock = AutoMock.GetLoose();
 
@@ -199,7 +199,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 		}
 
 		[Fact]
-		public void Publisch_Subscribe_Once_And_NotReciveDueFilter_Dispose()
+		public void Publish_Subscribe_Once_And_NotReciveDueFilter_Dispose()
 		{
 			using var mock = AutoMock.GetLoose();
 			mock.Mock<IManagedMqttClient>();
@@ -223,7 +223,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 		}
 
 		[Fact]
-		public void Publisch_Subscribe_Once_And_Recive_Dispose()
+		public void Publish_Subscribe_Once_And_Recive_Dispose()
 		{
 			using var mock = AutoMock.GetLoose();
 

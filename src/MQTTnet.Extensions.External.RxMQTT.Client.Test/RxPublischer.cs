@@ -12,7 +12,7 @@ using Xunit;
 
 namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 {
-    public class RxPublischer
+    public class RxPublisher
     {
         [Fact]
         public void Publish_HasFailed()
