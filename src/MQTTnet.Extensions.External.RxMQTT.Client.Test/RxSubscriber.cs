@@ -250,7 +250,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 		}
 
 		[Fact]
-		public void Publisch_Subscribe_WithTwoSubscriptions_ReciveOnce()
+		public void Publish_Subscribe_WithTwoSubscriptions_ReciveOnce()
 		{
 			using var mock = AutoMock.GetLoose();
 			mock.Mock<IManagedMqttClient>();
@@ -279,15 +279,19 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 
 			// set up first subscription
 			var result = testScheduler
-				.Start(() => rxMqttClinet.Connect("T/A").Merge(rxMqttClinet.Connect("T/+")).DistinctUntilChanged(), 0, 0, 4);
+				.Start(() => rxMqttClinet.Connect("T/A").Merge(rxMqttClinet.Connect("T/+")), 0, 0, 4);
 
 			// test
-			Assert.Equal(2, result.Messages.Count);
-			Assert.Equal(NotificationKind.OnNext, result.Messages.First().Value.Kind);
-			Assert.Equal(NotificationKind.OnNext, result.Messages.Last().Value.Kind);
-			Assert.Equal(eventArgs1, result.Messages.First().Value.Value);
-			Assert.Equal(eventArgs2, result.Messages.Last().Value.Value);
-		}
+			Assert.Equal(4, result.Messages.Count);
+			Assert.Equal(NotificationKind.OnNext, result.Messages[0].Value.Kind);
+			Assert.Equal(NotificationKind.OnNext, result.Messages[1].Value.Kind);
+			Assert.Equal(NotificationKind.OnNext, result.Messages[2].Value.Kind);
+            Assert.Equal(NotificationKind.OnNext, result.Messages[3].Value.Kind);
+			Assert.Equal(eventArgs1, result.Messages[0].Value.Value);
+			Assert.Equal(eventArgs1, result.Messages[1].Value.Value);
+            Assert.Equal(eventArgs2, result.Messages[2].Value.Value);
+			Assert.Equal(eventArgs2, result.Messages[3].Value.Value);
+        }
 
 		[Fact]
 		public async void PublishAsync()
