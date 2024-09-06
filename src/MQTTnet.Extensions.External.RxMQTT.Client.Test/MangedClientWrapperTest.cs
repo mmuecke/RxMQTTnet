@@ -223,7 +223,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         }
 
         [Fact]
-        public async void Options()
+        public async Task Options()
         {
             using var mock = AutoMock.GetLoose();
 
@@ -232,7 +232,8 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
            .WithClientOptions(new MqttClientOptionsBuilder()
                .WithClientId("Client1")
                .WithTcpServer("broker.hivemq.com")
-               .WithTls().Build())
+               .WithTlsOptions(_ => { })
+               .Build())
            .Build();
 
             mock.Mock<IManagedMqttClient>()
@@ -266,7 +267,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         }
 
         [Fact]
-        public async void PingAsync()
+        public async Task PingAsync()
         {
             using var mock = AutoMock.GetLoose();
 
@@ -283,7 +284,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         }
 
         [Fact]
-        public async void PublishAsync()
+        public async Task PublishAsync()
         {
             using var mock = AutoMock.GetLoose();
             var message = new ManagedMqttApplicationMessage();
@@ -313,7 +314,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         }
 
         [Fact]
-        public async void PublishAsync_CancellationToken()
+        public async Task PublishAsync_CancellationToken()
         {
             using var mock = AutoMock.GetLoose();
             var message = new MqttApplicationMessage();
@@ -377,7 +378,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         }
 
         [Fact]
-        public async void StartAsync()
+        public async Task StartAsync()
         {
             using var mock = AutoMock.GetLoose();
             var options = new ManagedMqttClientOptionsBuilder()
@@ -385,7 +386,8 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .WithClientOptions(new MqttClientOptionsBuilder()
                     .WithClientId("Client1")
                     .WithTcpServer("broker.hivemq.com")
-                    .WithTls().Build())
+                    .WithTlsOptions(_ => { })
+                    .Build())
                 .Build();
 
             mock.Mock<IManagedMqttClient>();
@@ -410,7 +412,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         }
 
         [Fact]
-        public async void StopAsync()
+        public async Task StopAsync()
         {
             using var mock = AutoMock.GetLoose();
 
