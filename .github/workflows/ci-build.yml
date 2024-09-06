@@ -18,14 +18,14 @@ jobs:
       nbgv: ${{ steps.nbgv.outputs.SemVer2 }}
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
     - name: Install .NET Core
-      uses: actions/setup-dotnet@v3
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 7.0.x
+        dotnet-version: 8.0.x
 
     - name: NBGV
       id: nbgv
@@ -57,14 +57,14 @@ jobs:
       working-directory: src
 
     - name: Upload Code Coverage
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos, otherwise set api token in repository secrets
         files: "*/coverage.cobertura.xml"
         directory: src
 
     - name: Create NuGet Artifacts
-      uses: actions/upload-artifact@master
+      uses: actions/upload-artifact@v4
       with:
         name: nuget
         path: '**/*.nupkg'
@@ -75,12 +75,12 @@ jobs:
     if: contains(github.event.pull_request.labels.*.name, 'release') && github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
     - name: Download NuGet Packages
-      uses: actions/download-artifact@v3
+      uses: actions/download-artifact@v4
       with:
         name: nuget    
 
@@ -89,7 +89,7 @@ jobs:
       id: changelog
 
     - name: Create Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with: 
         token: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
         tag_name: ${{ needs.build.outputs.nbgv }}
