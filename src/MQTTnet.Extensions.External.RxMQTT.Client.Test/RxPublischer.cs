@@ -25,7 +25,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .SetupGet(x => x.IsConnected)
                 .Returns(true);
 
-            var rxMqttClinet = mock.Create<RxMqttClient>();
+            var rxMqttClient = mock.Create<RxMqttClient>();
 
             var message = new ManagedMqttApplicationMessageBuilder()
                 .WithApplicationMessage(new MqttApplicationMessageBuilder()
@@ -43,7 +43,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 mock.Mock<IManagedMqttClient>().Raise(x => x.ApplicationMessageProcessedAsync -= null, (object)@event));
 
             // act
-            var testObserver = testScheduler.Start(() => observable.PublishOn(rxMqttClinet), 0, 1, 10);
+            var testObserver = testScheduler.Start(() => observable.PublishOn(rxMqttClient), 0, 1, 10);
 
             Assert.Single(testObserver.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnNext));
             Assert.Single(testObserver.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnCompleted));
@@ -65,7 +65,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .SetupGet(x => x.IsConnected)
                 .Returns(true);
 
-            var rxMqttClinet = mock.Create<RxMqttClient>();
+            var rxMqttClient = mock.Create<RxMqttClient>();
 
             var message = new ManagedMqttApplicationMessageBuilder()
                 .WithApplicationMessage(new MqttApplicationMessageBuilder()
@@ -82,7 +82,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                  mock.Mock<IManagedMqttClient>().Raise(x => x.ApplicationMessageSkippedAsync -= null, (object)@event));
             
             // act
-            var testObserver = testScheduler.Start(() => observable.PublishOn(rxMqttClinet), 0, 1, 10);
+            var testObserver = testScheduler.Start(() => observable.PublishOn(rxMqttClient), 0, 1, 10);
 
             Assert.Single(testObserver.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnNext));
             Assert.Single(testObserver.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnCompleted));
@@ -104,7 +104,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .SetupGet(x => x.IsConnected)
                 .Returns(true);
 
-            var rxMqttClinet = mock.Create<RxMqttClient>();
+            var rxMqttClient = mock.Create<RxMqttClient>();
 
             var message = new ManagedMqttApplicationMessageBuilder()
                 .WithApplicationMessage(new MqttApplicationMessageBuilder()
@@ -120,7 +120,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             testScheduler.Schedule(TimeSpan.FromTicks(5), () =>
                 mock.Mock<IManagedMqttClient>().Raise(x => x.ApplicationMessageProcessedAsync -= null, (object )@event));
             // act
-            var testObserver = testScheduler.Start(() => observable.PublishOn(rxMqttClinet), 0, 1, 10);
+            var testObserver = testScheduler.Start(() => observable.PublishOn(rxMqttClient), 0, 1, 10);
 
             Assert.Single(testObserver.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnNext));
             Assert.Single(testObserver.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnCompleted));
@@ -143,7 +143,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
                 .SetupGet(x => x.IsConnected)
                 .Returns(true);
 
-            var rxMqttClinet = mock.Create<RxMqttClient>();
+            var rxMqttClient = mock.Create<RxMqttClient>();
 
             var message = new ManagedMqttApplicationMessageBuilder()
                 .WithApplicationMessage(new MqttApplicationMessageBuilder()
@@ -159,7 +159,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             testScheduler.Schedule(TimeSpan.FromTicks(5), () =>
                 mock.Mock<IManagedMqttClient>().Raise(x => x.ApplicationMessageProcessedAsync -= null, (object)@event));
             // act
-            var testObserver = testScheduler.Start(() => observable.PublishOn(rxMqttClinet), 0, 1, 10);
+            var testObserver = testScheduler.Start(() => observable.PublishOn(rxMqttClient), 0, 1, 10);
 
             Assert.Single(testObserver.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnNext));
             Assert.Single(testObserver.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnCompleted));
@@ -178,7 +178,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             mock.Mock<IRxMqttClient>().Setup(x => x.ApplicationMessageProcessedEvent).Returns(Observable.Never<ApplicationMessageProcessedEventArgs>());
             mock.Mock<IRxMqttClient>().Setup(x => x.ApplicationMessageSkippedEvent).Returns(Observable.Never<ApplicationMessageSkippedEventArgs>());
             mock.Mock<IRxMqttClient>().Setup(x => x.IsConnected).Returns(true);
-            var rxMqttClinet = mock.Mock<IRxMqttClient>();
+            var rxMqttClient = mock.Mock<IRxMqttClient>();
 
             var message = new ManagedMqttApplicationMessageBuilder()
                 .WithApplicationMessage(new MqttApplicationMessageBuilder()
@@ -190,10 +190,10 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             var observable = Observable.Return(message);
 
             // act
-            rxMqttClinet.Object.Publish(observable).Subscribe();
+            rxMqttClient.Object.Publish(observable).Subscribe();
 
             // test
-            rxMqttClinet.Verify(x => x.PublishAsync(message));
+            rxMqttClient.Verify(x => x.PublishAsync(message));
         }
 
         [Fact]
@@ -201,11 +201,11 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         {
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>();
-            var rxMqttClinet = mock.Create<RxMqttClient>();
+            var rxMqttClient = mock.Create<RxMqttClient>();
             IObservable<ManagedMqttApplicationMessage> observable = null;
 
             // test
-            Assert.Throws<ArgumentNullException>(() => rxMqttClinet.Publish(observable));
+            Assert.Throws<ArgumentNullException>(() => rxMqttClient.Publish(observable));
         }
 
         [Fact]
@@ -213,11 +213,11 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         {
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>();
-            RxMqttClient rxMqttClinet = null;
+            RxMqttClient rxMqttClient = null;
             var observable = Observable.Never<ManagedMqttApplicationMessage>();
 
             // test
-            Assert.Throws<ArgumentNullException>(() => rxMqttClinet.Publish(observable));
+            Assert.Throws<ArgumentNullException>(() => rxMqttClient.Publish(observable));
         }
 
         [Fact]
@@ -228,7 +228,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             mock.Mock<IRxMqttClient>().Setup(x => x.ApplicationMessageProcessedEvent).Returns(Observable.Never<ApplicationMessageProcessedEventArgs>());
             mock.Mock<IRxMqttClient>().Setup(x => x.ApplicationMessageSkippedEvent).Returns(Observable.Never<ApplicationMessageSkippedEventArgs>());
             mock.Mock<IRxMqttClient>().Setup(x => x.IsConnected).Returns(true);
-            var rxMqttClinet = mock.Mock<IRxMqttClient>();
+            var rxMqttClient = mock.Mock<IRxMqttClient>();
 
             var message = new MqttApplicationMessageBuilder()
                 .WithTopic("T")
@@ -239,10 +239,10 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             var observable = Observable.Return(message);
 
             // act
-            rxMqttClinet.Object.Publish(observable).Subscribe();
+            rxMqttClient.Object.Publish(observable).Subscribe();
 
             // test
-            rxMqttClinet.Verify(x => x.PublishAsync(It.IsAny<ManagedMqttApplicationMessage>()));
+            rxMqttClient.Verify(x => x.PublishAsync(It.IsAny<ManagedMqttApplicationMessage>()));
         }
 
         [Fact]
@@ -250,11 +250,11 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         {
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>();
-            var rxMqttClinet = mock.Create<RxMqttClient>();
+            var rxMqttClient = mock.Create<RxMqttClient>();
             IObservable<MqttApplicationMessage> observable = null;
 
             // test
-            Assert.Throws<ArgumentNullException>(() => rxMqttClinet.Publish(observable));
+            Assert.Throws<ArgumentNullException>(() => rxMqttClient.Publish(observable));
         }
 
         [Fact]
@@ -262,11 +262,11 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         {
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>();
-            RxMqttClient rxMqttClinet = null;
+            RxMqttClient rxMqttClient = null;
             var observable = Observable.Never<MqttApplicationMessage>();
 
             // test
-            Assert.Throws<ArgumentNullException>(() => rxMqttClinet.Publish(observable));
+            Assert.Throws<ArgumentNullException>(() => rxMqttClient.Publish(observable));
         }
 
         [Fact]
@@ -277,7 +277,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             mock.Mock<IManagedMqttClient>()
                 .Setup(x => x.EnqueueAsync(It.IsAny<ManagedMqttApplicationMessage>())).Returns(Task.CompletedTask);
 
-            var rxMqttClinet = mock.Create<RxMqttClient>();
+            var rxMqttClient = mock.Create<RxMqttClient>();
 
             var message = new ManagedMqttApplicationMessageBuilder()
                 .WithApplicationMessage(new MqttApplicationMessageBuilder()
@@ -291,7 +291,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
 
             var testScheduler = new TestScheduler();
             // act
-            var testObserver = testScheduler.Start(() => observable.PublishOn(rxMqttClinet), 0, 0, 2);
+            var testObserver = testScheduler.Start(() => observable.PublishOn(rxMqttClient), 0, 0, 2);
 
             Assert.Single(testObserver.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnNext));
             Assert.Single(testObserver.Messages.Where(m => m.Value.Kind == System.Reactive.NotificationKind.OnCompleted));
@@ -307,11 +307,11 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         {
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>();
-            var rxMqttClinet = mock.Create<RxMqttClient>();
+            var rxMqttClient = mock.Create<RxMqttClient>();
             IObservable<ManagedMqttApplicationMessage> observable = null;
 
             // test
-            Assert.Throws<ArgumentNullException>(() => observable.PublishOn(rxMqttClinet));
+            Assert.Throws<ArgumentNullException>(() => observable.PublishOn(rxMqttClient));
         }
 
         [Fact]
@@ -319,11 +319,11 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         {
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>();
-            RxMqttClient rxMqttClinet = null;
+            RxMqttClient rxMqttClient = null;
             var observable = Observable.Never<ManagedMqttApplicationMessage>();
 
             // test
-            Assert.Throws<ArgumentNullException>(() => observable.PublishOn(rxMqttClinet));
+            Assert.Throws<ArgumentNullException>(() => observable.PublishOn(rxMqttClient));
         }
 
         [Fact]
@@ -334,7 +334,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             mock.Mock<IRxMqttClient>().Setup(x => x.ApplicationMessageProcessedEvent).Returns(Observable.Never<ApplicationMessageProcessedEventArgs>());
             mock.Mock<IRxMqttClient>().Setup(x => x.ApplicationMessageSkippedEvent).Returns(Observable.Never<ApplicationMessageSkippedEventArgs>());
             mock.Mock<IRxMqttClient>().Setup(x => x.IsConnected).Returns(true);
-            var rxMqttClinet = mock.Mock<IRxMqttClient>();
+            var rxMqttClient = mock.Mock<IRxMqttClient>();
 
             var message = new MqttApplicationMessageBuilder()
                 .WithTopic("T")
@@ -345,10 +345,10 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
             var observable = Observable.Return(message);
 
             // act
-            observable.PublishOn(rxMqttClinet.Object).Subscribe();
+            observable.PublishOn(rxMqttClient.Object).Subscribe();
 
             // test
-            rxMqttClinet.Verify(x => x.PublishAsync(It.IsAny<ManagedMqttApplicationMessage>()));
+            rxMqttClient.Verify(x => x.PublishAsync(It.IsAny<ManagedMqttApplicationMessage>()));
         }
 
         [Fact]
@@ -356,11 +356,11 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         {
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>();
-            var rxMqttClinet = mock.Create<RxMqttClient>();
+            var rxMqttClient = mock.Create<RxMqttClient>();
             IObservable<MqttApplicationMessage> observable = null;
 
             // test
-            Assert.Throws<ArgumentNullException>(() => observable.PublishOn(rxMqttClinet));
+            Assert.Throws<ArgumentNullException>(() => observable.PublishOn(rxMqttClient));
         }
 
         [Fact]
@@ -368,11 +368,11 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         {
             using var mock = AutoMock.GetLoose();
             mock.Mock<IManagedMqttClient>();
-            RxMqttClient rxMqttClinet = null;
+            RxMqttClient rxMqttClient = null;
             var observable = Observable.Never<MqttApplicationMessage>();
 
             // test
-            Assert.Throws<ArgumentNullException>(() => observable.PublishOn(rxMqttClinet));
+            Assert.Throws<ArgumentNullException>(() => observable.PublishOn(rxMqttClient));
         }
     }
 }
