@@ -38,7 +38,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client
                     {
                         try
                         {
-                            observer.OnNext(getPayloadFunc(message.Payload));
+                            observer.OnNext(getPayloadFunc(message.PayloadSegment.Array));
                         }
                         catch (Exception exception)
                         {
