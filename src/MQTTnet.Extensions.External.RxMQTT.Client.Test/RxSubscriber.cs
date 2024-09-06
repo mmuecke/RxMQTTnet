@@ -294,7 +294,7 @@ namespace MQTTnet.Extensions.External.RxMQTT.Client.Test
         }
 
 		[Fact]
-		public async void PublishAsync()
+		public async Task PublishAsync()
 		{
 			using var mock = AutoMock.GetLoose();
 			mock.Mock<IManagedMqttClient>();
