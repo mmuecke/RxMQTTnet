@@ -64,7 +64,7 @@ jobs:
         directory: src
 
     - name: Create NuGet Artifacts
-      uses: actions/upload-artifact@master
+      uses: actions/upload-artifact@4
       with:
         name: nuget
         path: '**/*.nupkg'
